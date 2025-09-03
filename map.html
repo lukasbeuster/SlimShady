@@ -7,6 +7,8 @@
   
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Proj4 for coordinate transformation -->
+  <script src="https://unpkg.com/proj4@2.9.0/dist/proj4.js"></script>
   
   <style>
     * {
@@ -15,13 +17,14 @@
       box-sizing: border-box;
     }
 
-    /* SCL Color Variables */
+    /* SCL Color Variables - Dark Mode */
     :root {
       --scl-green: #95C11F;
       --scl-dark-green: #5B7026;
-      --scl-text: #000000;
-      --scl-background: #ffffff;
-      --scl-accent: rgba(149, 193, 31, 0.1);
+      --scl-text: #ffffff;
+      --scl-background: #1a1a1a;
+      --scl-accent: rgba(149, 193, 31, 0.2);
+      --scl-card-bg: rgba(0, 0, 0, 0.8);
     }
 
     body {
@@ -37,6 +40,11 @@
       height: 100vh;
     }
 
+    /* Dark mode map tiles filter */
+    .leaflet-tile {
+      filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) invert(1);
+    }
+
     /* Header overlay */
     .header {
       position: absolute;
@@ -44,18 +52,19 @@
       left: 20px;
       right: 20px;
       z-index: 1000;
-      background: rgba(255, 255, 255, 0.95);
+      background: var(--scl-card-bg);
       padding: 15px 25px;
       border-radius: 15px;
-      box-shadow: 0 8px 32px rgba(149, 193, 31, 0.1);
-      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(20px);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      border: 1px solid rgba(149, 193, 31, 0.3);
     }
 
     .header h1 {
-      color: var(--scl-dark-green);
+      color: var(--scl-green);
       font-size: 1.5rem;
       font-weight: 700;
     }
@@ -63,7 +72,7 @@
     .header .subtitle {
       color: var(--scl-text);
       font-size: 0.9rem;
-      opacity: 0.7;
+      opacity: 0.8;
     }
 
     .back-button {
@@ -80,6 +89,7 @@
     .back-button:hover {
       background: var(--scl-dark-green);
       transform: translateY(-1px);
+      filter: brightness(1.1);
     }
 
     /* Legend */
@@ -88,16 +98,17 @@
       bottom: 30px;
       left: 20px;
       z-index: 1000;
-      background: rgba(255, 255, 255, 0.95);
+      background: var(--scl-card-bg);
       padding: 20px;
       border-radius: 15px;
-      box-shadow: 0 8px 32px rgba(149, 193, 31, 0.1);
-      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(20px);
       min-width: 200px;
+      border: 1px solid rgba(149, 193, 31, 0.3);
     }
 
     .legend h3 {
-      color: var(--scl-dark-green);
+      color: var(--scl-green);
       margin-bottom: 10px;
       font-size: 1rem;
     }
@@ -113,7 +124,7 @@
       height: 20px;
       border-radius: 3px;
       margin-right: 10px;
-      border: 1px solid rgba(0,0,0,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
     }
 
     .legend-label {
@@ -127,17 +138,18 @@
       top: 100px;
       right: 20px;
       z-index: 1000;
-      background: rgba(255, 255, 255, 0.95);
+      background: var(--scl-card-bg);
       padding: 20px;
       border-radius: 15px;
-      box-shadow: 0 8px 32px rgba(149, 193, 31, 0.1);
-      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(20px);
       max-width: 300px;
       display: none;
+      border: 1px solid rgba(149, 193, 31, 0.3);
     }
 
     .info-panel h3 {
-      color: var(--scl-dark-green);
+      color: var(--scl-green);
       margin-bottom: 10px;
     }
 
@@ -152,11 +164,12 @@
       left: 50%;
       transform: translate(-50%, -50%);
       z-index: 2000;
-      background: rgba(255, 255, 255, 0.9);
+      background: var(--scl-card-bg);
       padding: 20px 30px;
       border-radius: 15px;
       text-align: center;
       display: none;
+      border: 1px solid rgba(149, 193, 31, 0.3);
     }
 
     .loading.show {
@@ -195,11 +208,25 @@
       
       .info-panel {
         top: auto;
-        bottom: 120px;
+        bottom: 200px;
         right: 20px;
         left: 20px;
         max-width: none;
       }
+    }
+
+    /* Custom tooltip styling */
+    .leaflet-tooltip {
+      background: var(--scl-card-bg) !important;
+      border: 1px solid rgba(149, 193, 31, 0.5) !important;
+      color: var(--scl-text) !important;
+      border-radius: 8px !important;
+    }
+
+    .leaflet-popup-content-wrapper {
+      background: var(--scl-card-bg) !important;
+      color: var(--scl-text) !important;
+      border-radius: 8px !important;
     }
   </style>
 </head>

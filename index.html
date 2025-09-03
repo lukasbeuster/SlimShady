@@ -13,19 +13,20 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #ffffff;
-      color: #000000;
+      background: #1a1a1a;
+      color: #ffffff;
       overflow: hidden;
       height: 100vh;
     }
 
-    /* SCL Color Variables */
+    /* SCL Color Variables - Dark Mode */
     :root {
       --scl-green: #95C11F;
       --scl-dark-green: #5B7026;
-      --scl-text: #000000;
-      --scl-background: #ffffff;
-      --scl-accent: rgba(149, 193, 31, 0.1);
+      --scl-text: #ffffff;
+      --scl-background: #1a1a1a;
+      --scl-accent: rgba(149, 193, 31, 0.2);
+      --scl-card-bg: rgba(255, 255, 255, 0.1);
     }
 
     .landing-container {
@@ -54,18 +55,19 @@
       text-align: center;
       max-width: 600px;
       padding: 2rem;
-      background: rgba(255, 255, 255, 0.95);
+      background: var(--scl-card-bg);
       border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(149, 193, 31, 0.1);
-      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(149, 193, 31, 0.3);
     }
 
     .title {
       font-size: 3.5rem;
       font-weight: 700;
-      color: var(--scl-dark-green);
+      color: var(--scl-green);
       margin-bottom: 1rem;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+      text-shadow: 2px 2px 8px rgba(149, 193, 31, 0.3);
     }
 
     .subtitle {
@@ -73,6 +75,7 @@
       color: var(--scl-text);
       margin-bottom: 2rem;
       line-height: 1.6;
+      opacity: 0.9;
     }
 
     .enter-button {
@@ -87,19 +90,20 @@
       transition: all 0.3s ease;
       text-decoration: none;
       display: inline-block;
-      box-shadow: 0 10px 30px rgba(149, 193, 31, 0.3);
+      box-shadow: 0 10px 30px rgba(149, 193, 31, 0.4);
     }
 
     .enter-button:hover {
       transform: translateY(-2px);
-      box-shadow: 0 15px 40px rgba(149, 193, 31, 0.4);
+      box-shadow: 0 15px 40px rgba(149, 193, 31, 0.6);
+      filter: brightness(1.1);
     }
 
     .description {
       font-size: 0.9rem;
-      color: var(--scl-dark-green);
+      color: var(--scl-text);
       margin-top: 1.5rem;
-      opacity: 0.8;
+      opacity: 0.7;
     }
 
     /* Responsive */
