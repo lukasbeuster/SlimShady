@@ -1,19 +1,16 @@
-// Define coordinate systems
-proj4.defs("EPSG:28992", "+proj=sterea +lat_0=52.15616055555555 +lon_0=5.38763888888889 +k=0.9999079 +x_0=155000 +y_0=463000 +ellps=bessel +towgs84=565.417,50.3319,465.552,-0.398957,0.343988,-1.8774,4.0725 +units=m +no_defs");
-
 // SCL Color scheme for shade visualization
 const SCL_COLORS = {
   green: '#95C11F',
   darkGreen: '#5B7026',
   text: '#ffffff',
-  background: '#1a1a1a'
+  background: '#000000'
 };
 
 // Color scale for shade availability (0.0 to 1.0)
 function getShadeColor(shadeIndex) {
-  if (shadeIndex === undefined || shadeIndex === null) return '#999999';
+  if (shadeIndex === undefined || shadeIndex === null) return '#666666';
   
-  // Color scale from red (no shade) to dark green (full shade)
+  // Professional color scale from red (no shade) to dark green (full shade)
   if (shadeIndex <= 0.0) return '#B71C1C';      // Deep red
   if (shadeIndex <= 0.2) return '#FF5722';      // Orange-red
   if (shadeIndex <= 0.4) return '#FF9800';      // Orange
@@ -22,21 +19,42 @@ function getShadeColor(shadeIndex) {
   return SCL_COLORS.darkGreen;                   // SCL Dark Green
 }
 
-// Initialize map centered on Amsterdam
-const map = L.map('map').setView([52.3676, 4.9041], 11);
-
-// Add dark CartoDB tiles for better dark mode appearance
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-  attribution: '© OpenStreetMap contributors © CARTO',
-  maxZoom: 19,
-  subdomains: 'abcd'
-}).addTo(map);
-
-// Global variables for layers
+// Global variables
+let map = null;
 let mainSidewalksLayer = null;
 let buurtenLayer = null;
 let currentBuurtLayer = null;
-let loadedBuurten = new Map(); // Cache for loaded buurt data
+let loadedBuurten = new Map();
+let mapInitialized = false;
+
+// Initialize map only when section becomes visible
+function initializeMap() {
+  if (mapInitialized) return;
+  
+  console.log('Initializing SlimShady map...');
+  
+  // Initialize map centered on Amsterdam
+  map = L.map('map', {
+    zoomControl: false // We'll add custom controls
+  }).setView([52.3676, 4.9041], 11);
+
+  // Add custom zoom control in bottom right
+  L.control.zoom({
+    position: 'bottomright'
+  }).addTo(map);
+
+  // Add sophisticated dark tiles
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© <a href="https://carto.com">CARTO</a> | © <a href="https://openstreetmap.org">OpenStreetMap</a>',
+    maxZoom: 19,
+    subdomains: 'abcd'
+  }).addTo(map);
+  
+  mapInitialized = true;
+  
+  // Load data
+  loadMapData();
+}
 
 // Loading indicator functions
 function showLoading() {
@@ -49,212 +67,194 @@ function hideLoading() {
 
 // Info panel functions
 function showInfoPanel(content) {
-  const panel = document.getElementById('infoPanel');
+  document.getElementById('infoPanel').classList.add('active');
   document.getElementById('buurtInfo').innerHTML = content;
-  panel.classList.add('active');
 }
 
 function hideInfoPanel() {
   document.getElementById('infoPanel').classList.remove('active');
 }
 
-// Transform coordinates from RD (EPSG:28992) to WGS84 (EPSG:4326)
-function transformCoordinates(coords) {
-  if (Array.isArray(coords[0])) {
-    // Handle nested coordinate arrays (polygons)
-    return coords.map(ring => transformCoordinates(ring));
-  } else {
-    // Handle coordinate pair
-    const [x, y] = coords;
-    const [lng, lat] = proj4("EPSG:28992", "EPSG:4326", [x, y]);
-    return [lng, lat];
-  }
-}
-
-// Transform GeoJSON from RD to WGS84
-function transformGeoJSON(geojson) {
-  const transformed = JSON.parse(JSON.stringify(geojson)); // Deep clone
-  
-  transformed.features = transformed.features.map(feature => {
-    if (feature.geometry.type === 'Polygon') {
-      feature.geometry.coordinates = transformCoordinates(feature.geometry.coordinates);
-    } else if (feature.geometry.type === 'MultiPolygon') {
-      feature.geometry.coordinates = feature.geometry.coordinates.map(polygon => 
-        transformCoordinates(polygon)
-      );
-    }
-    return feature;
-  });
-  
-  return transformed;
-}
-
-// Style function for sidewalks based on shade index
+// Sophisticated styling functions
 function styleMainSidewalks(feature) {
   const shadeIndex = feature.properties.shade_availability_index_30;
+  
   return {
     color: getShadeColor(shadeIndex),
-    weight: 2,
+    weight: 1.5,
     opacity: 0.8,
     fillColor: getShadeColor(shadeIndex),
     fillOpacity: 0.6
   };
 }
 
-// Style function for buurt boundaries
-function styleBuurt(feature) {
+function styleDetailedSidewalks(feature) {
+  const shadeIndex = feature.properties.shade_availability_index_30;
+  
   return {
-    fillColor: 'transparent',
+    color: getShadeColor(shadeIndex),
     weight: 2,
-    opacity: 0.7,
+    opacity: 0.9,
+    fillColor: getShadeColor(shadeIndex),
+    fillOpacity: 0.75
+  };
+}
+
+function styleBuurten(feature) {
+  return {
     color: SCL_COLORS.green,
-    dashArray: '5, 5',
+    weight: 1,
+    opacity: 0.7,
+    fillColor: 'transparent',
     fillOpacity: 0
   };
 }
 
-// Load and display main sidewalks data
+// Load main sidewalks data
 async function loadMainData() {
   showLoading();
   
   try {
     console.log('Loading main sidewalks data...');
     const response = await fetch('data/sidewalks_web_minimal.geojson');
-    const data = await response.json();
+    const mainData = await response.json();
     
-    console.log('Main data loaded:', data.features.length, 'features');
-    console.log('Original CRS:', data.crs);
+    console.log('Main data loaded:', mainData.features.length, 'features');
     
-    // Transform coordinates if needed
-    console.log('Data transformed to WGS84');
-    
-    mainSidewalksLayer = L.geoJSON(data, {
+    mainSidewalksLayer = L.geoJSON(mainData, {
       style: styleMainSidewalks,
       onEachFeature: (feature, layer) => {
         const shadeIndex = feature.properties.shade_availability_index_30;
         const guid = feature.properties.Guid;
         
         layer.bindTooltip(`
-          <div style="color: #ffffff;">
-            <strong>Shade Index:</strong> ${shadeIndex?.toFixed(2) || 'N/A'}<br>
-            <strong>ID:</strong> ${guid || 'N/A'}
+          <div style="font-family: Inter, sans-serif;">
+            <div style="font-weight: 500; color: #95C11F; margin-bottom: 4px;">Shade Analysis</div>
+            <div>Index: <strong>${shadeIndex?.toFixed(3) || 'N/A'}</strong></div>
+            <div style="font-size: 11px; color: #888; margin-top: 4px;">ID: ${guid || 'N/A'}</div>
           </div>
-        `, {
-          sticky: true,
+        `, { 
+          permanent: false, 
+          direction: 'top',
           className: 'custom-tooltip'
         });
       }
     }).addTo(map);
     
+    console.log('Main sidewalks layer added successfully');
+    
     // Fit map to data bounds
-    if (data.features.length > 0) {
+    if (mainSidewalksLayer.getBounds().isValid()) {
       map.fitBounds(mainSidewalksLayer.getBounds(), { padding: [20, 20] });
     }
     
   } catch (error) {
     console.error('Error loading main data:', error);
-    alert('Error loading main sidewalks data: ' + error.message);
   } finally {
     hideLoading();
   }
 }
 
-// Load buurt boundaries
+// Load neighborhood boundaries
 async function loadBuurten() {
   try {
-    console.log('Loading buurt boundaries...');
+    console.log('Loading neighborhood boundaries...');
     const response = await fetch('data/geojson_lnglat.json');
-    const data = await response.json();
+    const buurtenData = await response.json();
     
-    console.log('Buurt data loaded:', data.features.length, 'features');
+    console.log('Neighborhood data loaded:', buurtenData.features.length, 'features');
     
-    buurtenLayer = L.geoJSON(data, {
-      style: styleBuurt,
+    buurtenLayer = L.geoJSON(buurtenData, {
+      style: styleBuurten,
       onEachFeature: (feature, layer) => {
         const props = feature.properties;
         const buurtName = props.Buurt || 'Unknown';
         const buurtCode = props.Buurtcode || props.CBS_Buurtcode || 'N/A';
-        const stadsdeel = props.Stadsdeel || 'N/A';
         
-        // Add hover effect
-        layer.on({
-          mouseover: (e) => {
-            const layer = e.target;
-            layer.setStyle({
-              weight: 3,
-              color: SCL_COLORS.green,
-              dashArray: '',
-              fillOpacity: 0.3,
-              fillColor: SCL_COLORS.green
-            });
-            
-            showInfoPanel(`
-              <strong>${buurtName}</strong><br>
-              <strong>Code:</strong> ${buurtCode}<br>
-              <strong>District:</strong> ${stadsdeel}<br>
-              <em style="color: ${SCL_COLORS.green};">Click to load detailed data</em>
-            `);
-          },
-          
-          mouseout: (e) => {
-            buurtenLayer.resetStyle(e.target);
-            hideInfoPanel();
-          },
-          
-          click: (e) => {
-            loadBuurtDetails(buurtCode, buurtName, e.target);
-          }
+        layer.bindTooltip(`
+          <div style="font-family: Inter, sans-serif;">
+            <div style="font-weight: 500; color: #95C11F; margin-bottom: 4px;">${buurtName}</div>
+            <div>Code: <strong>${buurtCode}</strong></div>
+            <div style="font-size: 11px; color: #888; margin-top: 4px;">Click for detailed analysis</div>
+          </div>
+        `, { 
+          permanent: false, 
+          direction: 'top',
+          className: 'custom-tooltip'
+        });
+
+        layer.on('mouseover', (e) => {
+          layer.setStyle({ 
+            fillOpacity: 0.2, 
+            opacity: 1.0,
+            weight: 2
+          });
+        });
+        
+        layer.on('mouseout', (e) => {
+          buurtenLayer.resetStyle(e.target);
+        });
+        
+        layer.on('click', (e) => {
+          loadBuurtDetails(buurtCode, buurtName, e.target);
         });
       }
     }).addTo(map);
     
+    console.log('Neighborhood boundaries added successfully');
+    
   } catch (error) {
-    console.error('Error loading buurt boundaries:', error);
-    alert('Error loading neighborhood boundaries: ' + error.message);
+    console.error('Error loading neighborhood boundaries:', error);
   }
 }
 
-// Load detailed buurt data
+// Load detailed neighborhood data
 async function loadBuurtDetails(buurtCode, buurtName, buurtLayer) {
   showLoading();
   
   try {
-    // Check if already loaded
+    // Check cache first
     if (loadedBuurten.has(buurtCode)) {
-      console.log('Using cached buurt data for', buurtCode);
+      console.log('Using cached data for', buurtCode);
       displayBuurtData(loadedBuurten.get(buurtCode), buurtName, buurtLayer);
       return;
     }
     
-    console.log('Loading detailed data for buurt:', buurtCode);
+    console.log('Loading detailed data for neighborhood:', buurtCode);
     const response = await fetch(`data/Buurt_data/${buurtCode}_sidewalks.geojson`);
     
     if (!response.ok) {
       throw new Error(`No detailed data available for ${buurtName} (${buurtCode})`);
     }
     
-    const data = await response.json();
-    console.log(`Loaded ${data.features.length} detailed features for ${buurtName}`);
+    const detailedData = await response.json();
+    console.log(`Loaded ${detailedData.features.length} detailed features for ${buurtName}`);
     
-    // Cache the transformed data
-    loadedBuurten.set(buurtCode, data);
+    // Cache the data
+    loadedBuurten.set(buurtCode, detailedData);
     
-    displayBuurtData(data, buurtName, buurtLayer);
+    displayBuurtData(detailedData, buurtName, buurtLayer);
     
   } catch (error) {
-    console.error('Error loading buurt details:', error);
+    console.error('Error loading neighborhood details:', error);
     showInfoPanel(`
-      <strong>${buurtName}</strong><br>
-      <em style="color: #ff6b6b;">No detailed data available for this neighborhood</em><br>
-      <small style="color: #999;">Error: ${error.message}</small>
+      <div class="info-title">${buurtName}</div>
+      <div style="color: #FF5722; margin: 12px 0;">
+        <strong>Data Unavailable</strong>
+      </div>
+      <div style="color: #888888; font-size: 12px;">
+        No detailed shade analysis available for this neighborhood.
+        <br><br>
+        <em>Error: ${error.message}</em>
+      </div>
     `);
   } finally {
     hideLoading();
   }
 }
 
-// Display detailed buurt data
-function displayBuurtData(data, buurtName, buurtLayer) {
+// Display detailed neighborhood analysis
+function displayBuurtData(buurtData, buurtName, buurtLayer) {
   // Remove previous detail layer
   if (currentBuurtLayer) {
     map.removeLayer(currentBuurtLayer);
@@ -265,110 +265,168 @@ function displayBuurtData(data, buurtName, buurtLayer) {
     map.removeLayer(mainSidewalksLayer);
   }
   
-  // Add detailed layer
-  currentBuurtLayer = L.geoJSON(data, {
-    style: (feature) => {
-      const shadeIndex = feature.properties.shade_availability_index_30;
-      return {
-        color: getShadeColor(shadeIndex),
-        weight: 3,
-        opacity: 0.9,
-        fillColor: getShadeColor(shadeIndex),
-        fillOpacity: 0.7
-      };
-    },
+  // Create new detailed layer
+  currentBuurtLayer = L.geoJSON(buurtData, {
+    style: styleDetailedSidewalks,
     onEachFeature: (feature, layer) => {
-      const props = feature.properties;
-      const shadeIndex = props.shade_availability_index_30;
+      const shadeIndex = feature.properties.shade_availability_index_30;
+      const guid = feature.properties.Guid;
       
       layer.bindTooltip(`
-        <div style="color: #ffffff;">
-          <strong>Detailed Sidewalk Info</strong><br>
-          <strong>Shade Index:</strong> ${shadeIndex?.toFixed(2) || 'N/A'}<br>
-          <strong>Function:</strong> ${props.Gebruiksfunctie || 'N/A'}<br>
-          <strong>Year Built:</strong> ${props.Jaar_van_aanleg || 'N/A'}<br>
-          <strong>Last Maintenance:</strong> ${props.Jaar_uitgevoerd_onderhoud || 'N/A'}
+        <div style="font-family: Inter, sans-serif;">
+          <div style="font-weight: 500; color: #95C11F; margin-bottom: 4px;">Detailed Analysis</div>
+          <div>Shade Index: <strong>${shadeIndex?.toFixed(3) || 'N/A'}</strong></div>
+          <div>Neighborhood: <strong>${buurtName}</strong></div>
+          <div style="font-size: 11px; color: #888; margin-top: 4px;">Segment: ${guid || 'N/A'}</div>
         </div>
-      `, {
-        sticky: true,
+      `, { 
+        permanent: false, 
+        direction: 'top',
         className: 'custom-tooltip'
       });
     }
   }).addTo(map);
   
-  // Zoom to buurt bounds
+  // Zoom to neighborhood bounds
   map.fitBounds(buurtLayer.getBounds(), { padding: [50, 50] });
-  
-  // Calculate statistics for this buurt
-  const shadeValues = data.features
+
+  // Calculate sophisticated statistics
+  const features = buurtData.features;
+  const shadeValues = features
     .map(f => f.properties.shade_availability_index_30)
-    .filter(v => v !== null && v !== undefined);
-    
+    .filter(val => val !== null && val !== undefined);
+  
   const avgShade = shadeValues.length > 0 ? 
-    (shadeValues.reduce((a, b) => a + b, 0) / shadeValues.length).toFixed(2) : 'N/A';
-  const minShade = shadeValues.length > 0 ? Math.min(...shadeValues).toFixed(2) : 'N/A';
-  const maxShade = shadeValues.length > 0 ? Math.max(...shadeValues).toFixed(2) : 'N/A';
+    (shadeValues.reduce((sum, val) => sum + val, 0) / shadeValues.length) : 0;
+  const maxShade = shadeValues.length > 0 ? Math.max(...shadeValues) : 0;
+  const minShade = shadeValues.length > 0 ? Math.min(...shadeValues) : 0;
+  const stdDev = shadeValues.length > 1 ? 
+    Math.sqrt(shadeValues.reduce((sum, val) => sum + Math.pow(val - avgShade, 2), 0) / shadeValues.length) : 0;
+  
+  // Quality assessment
+  const highShadeSegments = shadeValues.filter(val => val >= 0.6).length;
+  const lowShadeSegments = shadeValues.filter(val => val <= 0.2).length;
+  const coverage = shadeValues.length > 0 ? (highShadeSegments / shadeValues.length * 100) : 0;
   
   showInfoPanel(`
-    <strong style="color: ${SCL_COLORS.green};">${buurtName}</strong><br>
-    <strong>Features:</strong> ${data.features.length}<br>
-    <strong>Avg Shade:</strong> ${avgShade}<br>
-    <strong>Range:</strong> ${minShade} - ${maxShade}<br>
-    <button onclick="resetView()" style="
-      background: ${SCL_COLORS.green}; 
-      color: white; 
-      border: none; 
-      padding: 8px 16px; 
-      border-radius: 15px; 
-      cursor: pointer;
-      margin-top: 10px;
-      font-size: 0.8rem;
-      transition: all 0.3s ease;
-    " onmouseover="this.style.background='${SCL_COLORS.darkGreen}'" 
-       onmouseout="this.style.background='${SCL_COLORS.green}'">← Back to Overview</button>
+    <div class="info-title">${buurtName}</div>
+    <div class="info-stats">
+      <div style="margin-bottom: 16px; color: #cccccc;">
+        <strong>Statistical Analysis</strong>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+        <div>
+          <div style="font-size: 11px; color: #888; text-transform: uppercase;">Segments</div>
+          <div style="font-size: 16px; font-weight: 500; color: #95C11F;">${features.length}</div>
+        </div>
+        <div>
+          <div style="font-size: 11px; color: #888; text-transform: uppercase;">Coverage</div>
+          <div style="font-size: 16px; font-weight: 500; color: #95C11F;">${coverage.toFixed(1)}%</div>
+        </div>
+      </div>
+      
+      <div style="margin-bottom: 12px;">
+        <div style="font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 4px;">Shade Metrics</div>
+        <div style="font-size: 13px; color: #cccccc;">
+          <div>Mean: <strong>${avgShade.toFixed(3)}</strong></div>
+          <div>Range: <strong>${minShade.toFixed(3)}</strong> - <strong>${maxShade.toFixed(3)}</strong></div>
+          <div>Std Dev: <strong>${stdDev.toFixed(3)}</strong></div>
+        </div>
+      </div>
+      
+      <div style="margin-bottom: 16px;">
+        <div style="font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 4px;">Shade Distribution</div>
+        <div style="font-size: 13px; color: #cccccc;">
+          <div>High shade (≥0.6): <strong>${highShadeSegments}</strong> segments</div>
+          <div>Low shade (≤0.2): <strong>${lowShadeSegments}</strong> segments</div>
+        </div>
+      </div>
+      
+      <button onclick="showMainView()" style="
+        background: transparent;
+        color: #95C11F;
+        border: 1px solid #95C11F;
+        padding: 8px 16px;
+        font-family: Inter, sans-serif;
+        font-size: 12px;
+        font-weight: 300;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        width: 100%;
+      " onmouseover="this.style.background='#95C11F'; this.style.color='#000000';" 
+         onmouseout="this.style.background='transparent'; this.style.color='#95C11F';">
+        ← Return to Overview
+      </button>
+    </div>
   `);
 }
 
-// Reset to overview
-function resetView() {
-  // Remove detailed layer
+// Return to main overview
+function showMainView() {
   if (currentBuurtLayer) {
     map.removeLayer(currentBuurtLayer);
     currentBuurtLayer = null;
   }
   
-  // Show main layer again
   if (mainSidewalksLayer) {
-    map.addLayer(mainSidewalksLayer);
+    mainSidewalksLayer.addTo(map);
+    if (mainSidewalksLayer.getBounds().isValid()) {
+      map.fitBounds(mainSidewalksLayer.getBounds(), { padding: [20, 20] });
+    }
   }
-  
-  // Reset view to Amsterdam
-  map.setView([52.3676, 4.9041], 11);
   
   hideInfoPanel();
 }
 
-// Initialize the map
-async function initMap() {
-  console.log('Initializing SlimShady map...');
-  
+// Load all map data
+async function loadMapData() {
   try {
-    // Load data in sequence
     await loadMainData();
     await loadBuurten();
-    
-    console.log('Map initialization complete');
+    console.log('Map data loading complete');
   } catch (error) {
-    console.error('Map initialization failed:', error);
-    alert('Failed to initialize map: ' + error.message);
+    console.error('Error initializing map data:', error);
   }
 }
 
-// Start the application
-initMap();
+// Check if map section is visible and initialize
+function checkMapVisibility() {
+  const mapSection = document.getElementById('map-section');
+  const rect = mapSection.getBoundingClientRect();
+  
+  if (rect.top < window.innerHeight && rect.bottom > 0 && !mapInitialized) {
+    initializeMap();
+  }
+}
 
-// Add some debug info
-window.addEventListener('load', () => {
-  console.log('SlimShady map loaded successfully');
-  console.log('Proj4 loaded:', typeof proj4 !== 'undefined');
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  // Check initial visibility
+  setTimeout(checkMapVisibility, 100);
+  
+  // Listen for scroll events
+  let scrollTimeout;
+  window.addEventListener('scroll', () => {
+    if (scrollTimeout) clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(checkMapVisibility, 50);
+  });
+  
+  // Also initialize if user scrolls to map section
+  const mapSectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !mapInitialized) {
+        setTimeout(initializeMap, 200);
+      }
+    });
+  }, { threshold: 0.1 });
+  
+  const mapSection = document.getElementById('map-section');
+  if (mapSection) {
+    mapSectionObserver.observe(mapSection);
+  }
 });
+
+console.log('SlimShady unified page loaded');

@@ -15,101 +15,144 @@ const SCL_DARK_GREEN = '#5B7026';
 const BACKGROUND = '#1a1a1a';
 
 // CONFIGURABLE CONSTANTS
-const NUM_RAYS = 120; // ← CHANGE THIS NUMBER TO ADJUST RAY COUNT
-const RIPPLE_INTERVAL = 1200; // Time between ripples in milliseconds
-const MAX_CONCURRENT_RIPPLES = 5;
+const NUM_RAYS = 150; // More rays for denser coverage
+const RIPPLE_INTERVAL = 2000; // Time between ripples in milliseconds
+const MAX_CONCURRENT_RIPPLES = 3;
 
 // Animation variables
 let time = 0;
 let sunX, sunY;
 let obstacles = [];
 let ripples = [];
+let horizonY;
 
-// Initialize positions for street canyon scene
+// Initialize positions for realistic horizon cityscape
 function initializePositions() {
-  sunX = canvas.width * 0.85; // Sun position (top right)
-  sunY = canvas.height * 0.15;
+  sunX = canvas.width * 0.8; // Sun position (upper right)
+  sunY = canvas.height * 0.2;
+  horizonY = canvas.height * 0.75; // Horizon line at 75% down
 
-  // Street canyon obstacles - building, tree, road, park
+  // Horizon-based cityscape silhouette
   obstacles = [
-    // Main building on the left (tall office/apartment building)
+    // Tall building cluster (left side)
     { 
       type: 'building',
-      x: canvas.width * 0.15, 
-      y: canvas.height * 0.2, 
-      width: 120, 
-      height: canvas.height * 0.6,
+      x: canvas.width * 0.1, 
+      y: horizonY - canvas.height * 0.4, 
+      width: 60, 
+      height: canvas.height * 0.4,
       windows: true
     },
-    // Tree in front of building
-    { 
-      type: 'tree',
-      x: canvas.width * 0.35, 
-      y: canvas.height * 0.7, 
-      radius: 45
-    },
-    // Small building/shop on the right side
     { 
       type: 'building',
-      x: canvas.width * 0.7, 
-      y: canvas.height * 0.6, 
-      width: 90, 
+      x: canvas.width * 0.18, 
+      y: horizonY - canvas.height * 0.35, 
+      width: 45, 
+      height: canvas.height * 0.35,
+      windows: true
+    },
+    { 
+      type: 'building',
+      x: canvas.width * 0.25, 
+      y: horizonY - canvas.height * 0.45, 
+      width: 50, 
+      height: canvas.height * 0.45,
+      windows: true
+    },
+    
+    // Medium buildings (center)
+    { 
+      type: 'building',
+      x: canvas.width * 0.4, 
+      y: horizonY - canvas.height * 0.25, 
+      width: 40, 
       height: canvas.height * 0.25,
       windows: true
     },
-    // Park trees (small cluster)
+    { 
+      type: 'building',
+      x: canvas.width * 0.48, 
+      y: horizonY - canvas.height * 0.3, 
+      width: 35, 
+      height: canvas.height * 0.3,
+      windows: true
+    },
+    
+    // Trees interspersed along horizon
     { 
       type: 'tree',
-      x: canvas.width * 0.8, 
-      y: canvas.height * 0.85, 
+      x: canvas.width * 0.35, 
+      y: horizonY - 15, 
+      radius: 30
+    },
+    { 
+      type: 'tree',
+      x: canvas.width * 0.55, 
+      y: horizonY - 10, 
       radius: 25
     },
     { 
       type: 'tree',
-      x: canvas.width * 0.9, 
-      y: canvas.height * 0.8, 
-      radius: 20
+      x: canvas.width * 0.62, 
+      y: horizonY - 20, 
+      radius: 35
+    },
+    
+    // More distant buildings (right side)
+    { 
+      type: 'building',
+      x: canvas.width * 0.7, 
+      y: horizonY - canvas.height * 0.2, 
+      width: 30, 
+      height: canvas.height * 0.2,
+      windows: false
     },
     { 
-      type: 'tree',
+      type: 'building',
       x: canvas.width * 0.75, 
-      y: canvas.height * 0.9, 
-      radius: 18
+      y: horizonY - canvas.height * 0.15, 
+      width: 35, 
+      height: canvas.height * 0.15,
+      windows: false
+    },
+    { 
+      type: 'building',
+      x: canvas.width * 0.82, 
+      y: horizonY - canvas.height * 0.18, 
+      width: 25, 
+      height: canvas.height * 0.18,
+      windows: false
     }
   ];
 }
 
 initializePositions();
 
-// Enhanced Ripple class that interacts with obstacles
+// Enhanced Ripple class with horizon-aware collision
 class Ripple {
   constructor(x, y) {
     this.x = x;
     this.y = y;
     this.radius = 0;
-    this.maxRadius = Math.min(canvas.width, canvas.height) * 0.9;
+    this.maxRadius = Math.min(canvas.width, canvas.height) * 0.8;
     this.opacity = 1;
-    this.speed = 1.8;
-    this.segments = []; // Store segments that aren't blocked
+    this.speed = 1.5;
+    this.segments = [];
     this.calculateSegments();
   }
 
   calculateSegments() {
-    // Divide circle into segments and check which ones hit obstacles
-    const numSegments = 360;
+    const numSegments = 720; // Higher resolution for smoother blocking
     this.segments = [];
     
-    for (let angle = 0; angle < 360; angle += 2) {
+    for (let angle = 0; angle < 360; angle += 0.5) {
       const radians = (angle * Math.PI) / 180;
       const segment = {
-        startAngle: radians - 0.02,
-        endAngle: radians + 0.02,
-        blocked: false,
-        maxRadius: this.maxRadius
+        startAngle: radians - 0.005,
+        endAngle: radians + 0.005,
+        maxRadius: this.findObstacleDistance(radians)
       };
       
-      // Check if this segment hits any obstacle
-      segment.maxRadius = this.findObstacleDistance(radians);
       this.segments.push(segment);
     }
   }
@@ -127,7 +170,7 @@ class Ripple {
       }
       
       if (distance && distance < minDistance) {
-        minDistance = distance * 0.95; // Stop slightly before obstacle
+        minDistance = distance * 0.9;
       }
     }
     
@@ -138,7 +181,6 @@ class Ripple {
     const dx = Math.cos(angle);
     const dy = Math.sin(angle);
     
-    // Ray-rectangle intersection
     const left = rect.x;
     const right = rect.x + rect.width;
     const top = rect.y;
@@ -147,14 +189,14 @@ class Ripple {
     let tMin = 0;
     let tMax = this.maxRadius;
     
-    if (dx !== 0) {
+    if (Math.abs(dx) > 0.001) {
       const tx1 = (left - this.x) / dx;
       const tx2 = (right - this.x) / dx;
       tMin = Math.max(tMin, Math.min(tx1, tx2));
       tMax = Math.min(tMax, Math.max(tx1, tx2));
     }
     
-    if (dy !== 0) {
+    if (Math.abs(dy) > 0.001) {
       const ty1 = (top - this.y) / dy;
       const ty2 = (bottom - this.y) / dy;
       tMin = Math.max(tMin, Math.min(ty1, ty2));
@@ -182,12 +224,7 @@ class Ripple {
     
     if (discriminant >= 0) {
       const t1 = (-b - Math.sqrt(discriminant)) / (2 * a);
-      const t2 = (-b + Math.sqrt(discriminant)) / (2 * a);
-      
-      const minT = Math.min(t1, t2);
-      if (minT > 0) {
-        return minT;
-      }
+      if (t1 > 0) return t1;
     }
     return null;
   }
@@ -206,17 +243,17 @@ class Ripple {
     for (const segment of this.segments) {
       if (this.radius > segment.maxRadius) continue;
       
-      const alpha = this.opacity * 0.4;
+      const alpha = this.opacity * 0.25;
       ctx.strokeStyle = `rgba(149, 193, 31, ${alpha})`;
-      ctx.lineWidth = 2;
-      ctx.setLineDash([3, 6]);
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([2, 4]);
       
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.radius, segment.startAngle, segment.endAngle);
       ctx.stroke();
     }
     
-    ctx.setLineDash([]); // Reset dash
+    ctx.setLineDash([]);
   }
 }
 
@@ -231,8 +268,8 @@ class SunRay {
   }
 
   update() {
-    // Animate ray intensity - more constant stream effect
-    this.currentOpacity = this.baseOpacity + Math.sin(time * 0.3 + this.angle * 5) * 0.02;
+    // More subtle animation for professional look
+    this.currentOpacity = this.baseOpacity + Math.sin(time * 0.2 + this.angle * 3) * 0.015;
     this.currentOpacity = Math.max(0, Math.min(1, this.currentOpacity));
     this.checkObstacles();
   }
@@ -241,40 +278,27 @@ class SunRay {
     const endX = sunX + Math.cos(this.angle) * this.hitDistance;
     const endY = sunY + Math.sin(this.angle) * this.hitDistance;
 
+    // Create sophisticated gradient
+    const gradient = ctx.createLinearGradient(sunX, sunY, endX, endY);
+    
     if (this.blocked) {
-      // Draw ray up to obstacle
-      const gradient = ctx.createLinearGradient(sunX, sunY, endX, endY);
-      gradient.addColorStop(0, `rgba(255, 255, 120, ${this.currentOpacity * 0.7})`);
-      gradient.addColorStop(0.6, `rgba(149, 193, 31, ${this.currentOpacity * 0.4})`);
-      gradient.addColorStop(1, `rgba(149, 193, 31, 0.1)`);
-
-      ctx.strokeStyle = gradient;
-      ctx.lineWidth = 1.5;
-      
-      ctx.beginPath();
-      ctx.moveTo(sunX, sunY);
-      ctx.lineTo(endX, endY);
-      ctx.stroke();
+      gradient.addColorStop(0, `rgba(255, 255, 120, ${this.currentOpacity * 0.4})`);
+      gradient.addColorStop(0.7, `rgba(149, 193, 31, ${this.currentOpacity * 0.2})`);
+      gradient.addColorStop(1, `rgba(149, 193, 31, 0.05)`);
     } else {
-      // Draw full ray
-      const gradient = ctx.createLinearGradient(sunX, sunY, endX, endY);
-      gradient.addColorStop(0, `rgba(255, 255, 100, ${this.currentOpacity * 0.6})`);
-      gradient.addColorStop(0.3, `rgba(149, 193, 31, ${this.currentOpacity * 0.4})`);
-      gradient.addColorStop(0.8, `rgba(149, 193, 31, ${this.currentOpacity * 0.2})`);
+      gradient.addColorStop(0, `rgba(255, 255, 100, ${this.currentOpacity * 0.5})`);
+      gradient.addColorStop(0.3, `rgba(149, 193, 31, ${this.currentOpacity * 0.3})`);
+      gradient.addColorStop(0.8, `rgba(149, 193, 31, ${this.currentOpacity * 0.1})`);
       gradient.addColorStop(1, `rgba(149, 193, 31, 0)`);
-
-      ctx.strokeStyle = gradient;
-      ctx.lineWidth = 1.8;
-      ctx.shadowBlur = 4;
-      ctx.shadowColor = SCL_GREEN;
-      
-      ctx.beginPath();
-      ctx.moveTo(sunX, sunY);
-      ctx.lineTo(endX, endY);
-      ctx.stroke();
-      
-      ctx.shadowBlur = 0;
     }
+
+    ctx.strokeStyle = gradient;
+    ctx.lineWidth = this.blocked ? 1 : 1.2;
+    
+    ctx.beginPath();
+    ctx.moveTo(sunX, sunY);
+    ctx.lineTo(endX, endY);
+    ctx.stroke();
   }
 
   checkObstacles() {
@@ -350,16 +374,15 @@ class SunRay {
   }
 }
 
-// Create sun rays - now easily configurable!
+// Create sun rays
 const rays = [];
 for (let i = 0; i < NUM_RAYS; i++) {
   const angle = (i / NUM_RAYS) * Math.PI * 2;
-  const length = Math.min(canvas.width, canvas.height) * 1.2;
-  const baseOpacity = 0.12 + Math.random() * 0.06;
+  const length = Math.min(canvas.width, canvas.height) * 1.1;
+  const baseOpacity = 0.08 + Math.random() * 0.04; // More subtle
   rays.push(new SunRay(angle, length, baseOpacity));
 }
 
-// Ripple management
 function createRipple() {
   if (ripples.length < MAX_CONCURRENT_RIPPLES) {
     ripples.push(new Ripple(sunX, sunY));
@@ -369,33 +392,35 @@ function createRipple() {
 let lastRippleTime = 0;
 
 function drawSun() {
-  // Outer glow with subtle pulse
-  const pulseIntensity = 0.7 + Math.sin(time * 1.2) * 0.15;
-  const outerGlow = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 90 * pulseIntensity);
-  outerGlow.addColorStop(0, `rgba(255, 255, 150, ${pulseIntensity * 0.9})`);
-  outerGlow.addColorStop(0.4, `rgba(149, 193, 31, ${pulseIntensity * 0.6})`);
+  // More subtle sun with professional look
+  const pulseIntensity = 0.8 + Math.sin(time * 0.8) * 0.1;
+  
+  // Outer glow
+  const outerGlow = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 70 * pulseIntensity);
+  outerGlow.addColorStop(0, `rgba(255, 255, 150, ${pulseIntensity * 0.6})`);
+  outerGlow.addColorStop(0.5, `rgba(149, 193, 31, ${pulseIntensity * 0.3})`);
   outerGlow.addColorStop(1, 'rgba(149, 193, 31, 0)');
   
   ctx.fillStyle = outerGlow;
   ctx.beginPath();
-  ctx.arc(sunX, sunY, 90 * pulseIntensity, 0, Math.PI * 2);
+  ctx.arc(sunX, sunY, 70 * pulseIntensity, 0, Math.PI * 2);
   ctx.fill();
 
   // Inner glow
-  const innerGlow = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 35);
-  innerGlow.addColorStop(0, '#FFFF90');
-  innerGlow.addColorStop(0.6, '#FFD700');
+  const innerGlow = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 25);
+  innerGlow.addColorStop(0, '#FFFF80');
+  innerGlow.addColorStop(0.7, '#FFE55C');
   innerGlow.addColorStop(1, SCL_GREEN);
   
   ctx.fillStyle = innerGlow;
   ctx.beginPath();
-  ctx.arc(sunX, sunY, 35, 0, Math.PI * 2);
+  ctx.arc(sunX, sunY, 25, 0, Math.PI * 2);
   ctx.fill();
 
-  // Sun core
-  const pulseSize = 20 + Math.sin(time * 2.2) * 4;
+  // Sun core - smaller and more refined
+  const pulseSize = 12 + Math.sin(time * 1.5) * 2;
   ctx.fillStyle = '#FFFFFF';
-  ctx.shadowBlur = 25;
+  ctx.shadowBlur = 15;
   ctx.shadowColor = '#FFFF00';
   ctx.beginPath();
   ctx.arc(sunX, sunY, pulseSize, 0, Math.PI * 2);
@@ -403,64 +428,71 @@ function drawSun() {
   ctx.shadowBlur = 0;
 }
 
-function drawStreetCanyon() {
-  // Draw road/street surface first
-  const roadGradient = ctx.createLinearGradient(0, canvas.height * 0.85, 0, canvas.height);
-  roadGradient.addColorStop(0, '#444444');
-  roadGradient.addColorStop(1, '#222222');
-  ctx.fillStyle = roadGradient;
-  ctx.fillRect(0, canvas.height * 0.85, canvas.width, canvas.height * 0.15);
+function drawHorizonCityscape() {
+  // Draw horizon line
+  ctx.strokeStyle = 'rgba(149, 193, 31, 0.2)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([5, 15]);
+  ctx.beginPath();
+  ctx.moveTo(0, horizonY);
+  ctx.lineTo(canvas.width, horizonY);
+  ctx.stroke();
+  ctx.setLineDash([]);
 
-  // Draw obstacles with enhanced street canyon styling
+  // Draw obstacles along horizon
   for (const obstacle of obstacles) {
     if (obstacle.type === 'building') {
-      // Building gradient
+      // Professional building gradient
       const buildingGradient = ctx.createLinearGradient(obstacle.x, obstacle.y, obstacle.x, obstacle.y + obstacle.height);
-      buildingGradient.addColorStop(0, '#666666');
-      buildingGradient.addColorStop(0.3, SCL_DARK_GREEN);
-      buildingGradient.addColorStop(1, '#2a3013');
+      buildingGradient.addColorStop(0, '#555555');
+      buildingGradient.addColorStop(0.2, SCL_DARK_GREEN);
+      buildingGradient.addColorStop(0.8, '#2a2a2a');
+      buildingGradient.addColorStop(1, '#1a1a1a');
       
       ctx.fillStyle = buildingGradient;
       ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
       
-      // Building windows if specified
+      // Minimal building details
       if (obstacle.windows) {
-        ctx.fillStyle = 'rgba(255, 255, 150, 0.3)';
-        for (let row = 0; row < Math.floor(obstacle.height / 25); row++) {
-          for (let col = 0; col < Math.floor(obstacle.width / 20); col++) {
-            if (Math.random() > 0.3) { // Some windows are lit
-              const winX = obstacle.x + 5 + col * 20;
-              const winY = obstacle.y + 10 + row * 25;
-              ctx.fillRect(winX, winY, 10, 15);
+        ctx.fillStyle = 'rgba(149, 193, 31, 0.2)';
+        const windowRows = Math.floor(obstacle.height / 20);
+        const windowCols = Math.floor(obstacle.width / 15);
+        
+        for (let row = 1; row < windowRows; row++) {
+          for (let col = 0; col < windowCols; col++) {
+            if (Math.random() > 0.6) { // Sparse window lighting
+              const winX = obstacle.x + 3 + col * 15;
+              const winY = obstacle.y + 5 + row * 20;
+              ctx.fillRect(winX, winY, 8, 12);
             }
           }
         }
       }
       
-      // Building outline
-      ctx.strokeStyle = 'rgba(149, 193, 31, 0.7)';
-      ctx.lineWidth = 2;
+      // Subtle building outline
+      ctx.strokeStyle = 'rgba(149, 193, 31, 0.3)';
+      ctx.lineWidth = 0.5;
       ctx.strokeRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
       
     } else if (obstacle.type === 'tree') {
-      // Tree with more natural look
+      // Refined tree design
       const treeGradient = ctx.createRadialGradient(obstacle.x, obstacle.y, 0, obstacle.x, obstacle.y, obstacle.radius);
       treeGradient.addColorStop(0, SCL_GREEN);
-      treeGradient.addColorStop(0.6, SCL_DARK_GREEN);
+      treeGradient.addColorStop(0.7, SCL_DARK_GREEN);
       treeGradient.addColorStop(1, '#1a2008');
       
       ctx.fillStyle = treeGradient;
-      ctx.shadowBlur = 12;
-      ctx.shadowColor = SCL_GREEN;
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = 'rgba(149, 193, 31, 0.3)';
       ctx.beginPath();
       ctx.arc(obstacle.x, obstacle.y, obstacle.radius, 0, Math.PI * 2);
       ctx.fill();
       ctx.shadowBlur = 0;
       
-      // Tree trunk
-      ctx.fillStyle = '#4a3728';
-      const trunkWidth = obstacle.radius * 0.2;
-      const trunkHeight = obstacle.radius * 0.8;
+      // Minimal tree trunk
+      ctx.fillStyle = '#3a2f1f';
+      const trunkWidth = obstacle.radius * 0.15;
+      const trunkHeight = obstacle.radius * 0.6;
       ctx.fillRect(obstacle.x - trunkWidth/2, obstacle.y + obstacle.radius - trunkHeight/2, trunkWidth, trunkHeight);
     }
   }
@@ -473,14 +505,12 @@ function drawRipples() {
 }
 
 function updateRipples() {
-  // Update existing ripples and remove completed ones
   for (let i = ripples.length - 1; i >= 0; i--) {
     if (!ripples[i].update()) {
       ripples.splice(i, 1);
     }
   }
   
-  // Create new ripples periodically
   const currentTime = Date.now();
   if (currentTime - lastRippleTime > RIPPLE_INTERVAL) {
     createRipple();
@@ -503,11 +533,11 @@ function animate() {
     ray.draw();
   }
 
-  // Draw sun and street canyon scene on top
+  // Draw sun and refined cityscape
   drawSun();
-  drawStreetCanyon();
+  drawHorizonCityscape();
 
-  time += 0.025;
+  time += 0.02; // Slower, more professional animation
   requestAnimationFrame(animate);
 }
 
@@ -516,20 +546,18 @@ window.addEventListener('resize', () => {
   resizeCanvas();
   initializePositions();
   
-  // Update ray lengths
-  const maxLength = Math.min(canvas.width, canvas.height) * 1.2;
+  const maxLength = Math.min(canvas.width, canvas.height) * 1.1;
   for (const ray of rays) {
     ray.length = maxLength;
   }
   
-  // Clear and recreate ripples for new dimensions
   ripples = [];
 });
 
 // Start animation
 animate();
 
-// Create initial ripple after a short delay
+// Create initial ripple
 setTimeout(() => {
   createRipple();
-}, 800);
+}, 1500);
