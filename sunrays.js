@@ -17,7 +17,7 @@ const BACKGROUND = '#1a1a1a';
 // CONFIGURABLE CONSTANTS
 const NUM_RAYS = 150; // More rays for denser coverage
 const RIPPLE_INTERVAL = 2000; // Time between ripples in milliseconds
-const MAX_CONCURRENT_RIPPLES = 3;
+const MAX_CONCURRENT_RIPPLES = 6;
 
 // Animation variables
 let time = 0;
