@@ -22,13 +22,6 @@ Interactive web map visualizing sidewalk shade availability across Amsterdam nei
 - **Neighborhood Data**: 512 detailed buurt files with full attributes
 - **Shade Index**: Values from 0.0 (no shade) to 1.0 (full shade)
 
-## 🎨 Design
-
-Color scheme aligned with Senseable City Lab (MIT):
-- SCL Green: `#95C11F`
-- Dark Green: `#5B7026` 
-- Dark background with high contrast for accessibility
-
 ## 🚀 Deployment
 
 Optimized for GitHub Pages deployment with:
