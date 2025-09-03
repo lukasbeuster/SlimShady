@@ -6,17 +6,24 @@ const SCL_COLORS = {
   background: '#000000'
 };
 
-// Color scale for shade availability (0.0 to 1.0)
+// Shade categories with professional color mapping
 function getShadeColor(shadeIndex) {
   if (shadeIndex === undefined || shadeIndex === null) return '#666666';
   
-  // Professional color scale from red (no shade) to dark green (full shade)
-  if (shadeIndex <= 0.0) return '#B71C1C';      // Deep red
-  if (shadeIndex <= 0.2) return '#FF5722';      // Orange-red
-  if (shadeIndex <= 0.4) return '#FF9800';      // Orange
-  if (shadeIndex <= 0.6) return '#FFC107';      // Yellow
-  if (shadeIndex <= 0.8) return SCL_COLORS.green; // SCL Green
-  return SCL_COLORS.darkGreen;                   // SCL Dark Green
+  // Professional color scale aligned with shade categories
+  if (shadeIndex < 0.5) return '#B71C1C';        // Deep red - Poor Shading
+  if (shadeIndex < 0.7) return '#FF9800';        // Orange - Acceptable
+  if (shadeIndex < 0.9) return SCL_COLORS.green; // SCL Green - Very Good
+  return SCL_COLORS.darkGreen;                   // SCL Dark Green - Excellent
+}
+
+// Get shade category label
+function getShadeCategory(shadeIndex) {
+  if (shadeIndex === undefined || shadeIndex === null) return 'Unknown';
+  if (shadeIndex < 0.5) return 'Poor Shading';
+  if (shadeIndex < 0.7) return 'Acceptable';
+  if (shadeIndex < 0.9) return 'Very Good';
+  return 'Excellent';
 }
 
 // Global variables
@@ -126,11 +133,13 @@ async function loadMainData() {
       onEachFeature: (feature, layer) => {
         const shadeIndex = feature.properties.shade_availability_index_30;
         const guid = feature.properties.Guid;
+        const category = getShadeCategory(shadeIndex);
         
         layer.bindTooltip(`
           <div style="font-family: Inter, sans-serif;">
             <div style="font-weight: 500; color: #95C11F; margin-bottom: 4px;">Shade Analysis</div>
-            <div>Index: <strong>${shadeIndex?.toFixed(3) || 'N/A'}</strong></div>
+            <div>Category: <strong>${category}</strong></div>
+            <div>Index: <strong>${shadeIndex?.toFixed(2) || 'N/A'}</strong></div>
             <div style="font-size: 11px; color: #888; margin-top: 4px;">ID: ${guid || 'N/A'}</div>
           </div>
         `, { 
@@ -271,11 +280,13 @@ function displayBuurtData(buurtData, buurtName, buurtLayer) {
     onEachFeature: (feature, layer) => {
       const shadeIndex = feature.properties.shade_availability_index_30;
       const guid = feature.properties.Guid;
+      const category = getShadeCategory(shadeIndex);
       
       layer.bindTooltip(`
         <div style="font-family: Inter, sans-serif;">
           <div style="font-weight: 500; color: #95C11F; margin-bottom: 4px;">Detailed Analysis</div>
-          <div>Shade Index: <strong>${shadeIndex?.toFixed(3) || 'N/A'}</strong></div>
+          <div>Category: <strong>${category}</strong></div>
+          <div>Index: <strong>${shadeIndex?.toFixed(2) || 'N/A'}</strong></div>
           <div>Neighborhood: <strong>${buurtName}</strong></div>
           <div style="font-size: 11px; color: #888; margin-top: 4px;">Segment: ${guid || 'N/A'}</div>
         </div>
@@ -303,10 +314,12 @@ function displayBuurtData(buurtData, buurtName, buurtLayer) {
   const stdDev = shadeValues.length > 1 ? 
     Math.sqrt(shadeValues.reduce((sum, val) => sum + Math.pow(val - avgShade, 2), 0) / shadeValues.length) : 0;
   
-  // Quality assessment
-  const highShadeSegments = shadeValues.filter(val => val >= 0.6).length;
-  const lowShadeSegments = shadeValues.filter(val => val <= 0.2).length;
-  const coverage = shadeValues.length > 0 ? (highShadeSegments / shadeValues.length * 100) : 0;
+  // Category distribution
+  const poorShade = shadeValues.filter(val => val < 0.5).length;
+  const acceptableShade = shadeValues.filter(val => val >= 0.5 && val < 0.7).length;
+  const veryGoodShade = shadeValues.filter(val => val >= 0.7 && val < 0.9).length;
+  const excellentShade = shadeValues.filter(val => val >= 0.9).length;
+  const excellentCoverage = shadeValues.length > 0 ? (excellentShade / shadeValues.length * 100) : 0;
   
   showInfoPanel(`
     <div class="info-title">${buurtName}</div>
@@ -321,25 +334,27 @@ function displayBuurtData(buurtData, buurtName, buurtLayer) {
           <div style="font-size: 16px; font-weight: 500; color: #95C11F;">${features.length}</div>
         </div>
         <div>
-          <div style="font-size: 11px; color: #888; text-transform: uppercase;">Coverage</div>
-          <div style="font-size: 16px; font-weight: 500; color: #95C11F;">${coverage.toFixed(1)}%</div>
+          <div style="font-size: 11px; color: #888; text-transform: uppercase;">Excellent Coverage</div>
+          <div style="font-size: 16px; font-weight: 500; color: #95C11F;">${excellentCoverage.toFixed(1)}%</div>
         </div>
       </div>
       
       <div style="margin-bottom: 12px;">
         <div style="font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 4px;">Shade Metrics</div>
         <div style="font-size: 13px; color: #cccccc;">
-          <div>Mean: <strong>${avgShade.toFixed(3)}</strong></div>
-          <div>Range: <strong>${minShade.toFixed(3)}</strong> - <strong>${maxShade.toFixed(3)}</strong></div>
-          <div>Std Dev: <strong>${stdDev.toFixed(3)}</strong></div>
+          <div>Mean: <strong>${avgShade.toFixed(2)}</strong></div>
+          <div>Range: <strong>${minShade.toFixed(2)}</strong> - <strong>${maxShade.toFixed(2)}</strong></div>
+          <div>Std Dev: <strong>${stdDev.toFixed(2)}</strong></div>
         </div>
       </div>
       
       <div style="margin-bottom: 16px;">
-        <div style="font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 4px;">Shade Distribution</div>
+        <div style="font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 4px;">Category Distribution</div>
         <div style="font-size: 13px; color: #cccccc;">
-          <div>High shade (≥0.6): <strong>${highShadeSegments}</strong> segments</div>
-          <div>Low shade (≤0.2): <strong>${lowShadeSegments}</strong> segments</div>
+          <div style="color: #B71C1C;">Poor Shading: <strong>${poorShade}</strong> segments</div>
+          <div style="color: #FF9800;">Acceptable: <strong>${acceptableShade}</strong> segments</div>
+          <div style="color: #95C11F;">Very Good: <strong>${veryGoodShade}</strong> segments</div>
+          <div style="color: #5B7026;">Excellent: <strong>${excellentShade}</strong> segments</div>
         </div>
       </div>
       
