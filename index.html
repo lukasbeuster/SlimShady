@@ -2,22 +2,140 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Ripple Background</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SlimShady - Amsterdam Shade Analysis</title>
   <style>
-    html, body {
+    * {
       margin: 0;
       padding: 0;
-      overflow: hidden;
-      height: 100%;
-      background: #000;
+      box-sizing: border-box;
     }
-    canvas {
-      display: block;
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #ffffff;
+      color: #000000;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    /* SCL Color Variables */
+    :root {
+      --scl-green: #95C11F;
+      --scl-dark-green: #5B7026;
+      --scl-text: #000000;
+      --scl-background: #ffffff;
+      --scl-accent: rgba(149, 193, 31, 0.1);
+    }
+
+    .landing-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: var(--scl-background);
+    }
+
+    .sun-rays-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      max-width: 600px;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(149, 193, 31, 0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    .title {
+      font-size: 3.5rem;
+      font-weight: 700;
+      color: var(--scl-dark-green);
+      margin-bottom: 1rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: var(--scl-text);
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .enter-button {
+      background: linear-gradient(135deg, var(--scl-green), var(--scl-dark-green));
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      box-shadow: 0 10px 30px rgba(149, 193, 31, 0.3);
+    }
+
+    .enter-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(149, 193, 31, 0.4);
+    }
+
+    .description {
+      font-size: 0.9rem;
+      color: var(--scl-dark-green);
+      margin-top: 1.5rem;
+      opacity: 0.8;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .title {
+        font-size: 2.5rem;
+      }
+      .content {
+        margin: 1rem;
+        padding: 1.5rem;
+      }
     }
   </style>
 </head>
 <body>
-  <canvas id="rippleCanvas"></canvas>
-  <script src="ripple.js"></script>
+  <div class="landing-container">
+    <canvas id="sunRaysCanvas" class="sun-rays-canvas"></canvas>
+    
+    <div class="content">
+      <h1 class="title">SlimShady</h1>
+      <p class="subtitle">
+        Exploring Amsterdam's Urban Shade<br>
+        Interactive mapping of sidewalk shade availability across the city
+      </p>
+      
+      <a href="map.html" class="enter-button">
+        Explore the Map
+      </a>
+      
+      <p class="description">
+        Discover how buildings and trees create natural shade patterns<br>
+        throughout Amsterdam's neighborhoods
+      </p>
+    </div>
+  </div>
+
+  <script src="sunrays.js"></script>
 </body>
 </html>

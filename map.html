@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SlimShady - Amsterdam Shade Map</title>
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* SCL Color Variables */
+    :root {
+      --scl-green: #95C11F;
+      --scl-dark-green: #5B7026;
+      --scl-text: #000000;
+      --scl-background: #ffffff;
+      --scl-accent: rgba(149, 193, 31, 0.1);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--scl-background);
+      color: var(--scl-text);
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #map {
+      width: 100%;
+      height: 100vh;
+    }
+
+    /* Header overlay */
+    .header {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 15px 25px;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(149, 193, 31, 0.1);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      color: var(--scl-dark-green);
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .header .subtitle {
+      color: var(--scl-text);
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+
+    .back-button {
+      background: var(--scl-green);
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+      background: var(--scl-dark-green);
+      transform: translateY(-1px);
+    }
+
+    /* Legend */
+    .legend {
+      position: absolute;
+      bottom: 30px;
+      left: 20px;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(149, 193, 31, 0.1);
+      backdrop-filter: blur(10px);
+      min-width: 200px;
+    }
+
+    .legend h3 {
+      color: var(--scl-dark-green);
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      border-radius: 3px;
+      margin-right: 10px;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .legend-label {
+      font-size: 0.85rem;
+      color: var(--scl-text);
+    }
+
+    /* Info panel */
+    .info-panel {
+      position: absolute;
+      top: 100px;
+      right: 20px;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(149, 193, 31, 0.1);
+      backdrop-filter: blur(10px);
+      max-width: 300px;
+      display: none;
+    }
+
+    .info-panel h3 {
+      color: var(--scl-dark-green);
+      margin-bottom: 10px;
+    }
+
+    .info-panel.active {
+      display: block;
+    }
+
+    /* Loading indicator */
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2000;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 20px 30px;
+      border-radius: 15px;
+      text-align: center;
+      display: none;
+    }
+
+    .loading.show {
+      display: block;
+    }
+
+    .spinner {
+      border: 3px solid var(--scl-accent);
+      border-top: 3px solid var(--scl-green);
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+      }
+      
+      .legend {
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        max-width: none;
+      }
+      
+      .info-panel {
+        top: auto;
+        bottom: 120px;
+        right: 20px;
+        left: 20px;
+        max-width: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>SlimShady</h1>
+      <p class="subtitle">Amsterdam Shade Analysis</p>
+    </div>
+    <a href="index.html" class="back-button">← Home</a>
+  </div>
+
+  <div id="map"></div>
+
+  <div class="legend">
+    <h3>Shade Availability</h3>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #B71C1C;"></div>
+      <span class="legend-label">No shade (0.0)</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #FF5722;"></div>
+      <span class="legend-label">Low shade (0.2)</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #FFC107;"></div>
+      <span class="legend-label">Medium shade (0.5)</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: var(--scl-green);"></div>
+      <span class="legend-label">Good shade (0.8)</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: var(--scl-dark-green);"></div>
+      <span class="legend-label">Full shade (1.0)</span>
+    </div>
+  </div>
+
+  <div class="info-panel" id="infoPanel">
+    <h3>Neighborhood Details</h3>
+    <div id="buurtInfo">
+      Click on a neighborhood to see detailed information
+    </div>
+  </div>
+
+  <div class="loading" id="loadingIndicator">
+    <div class="spinner"></div>
+    <p>Loading neighborhood data...</p>
+  </div>
+
+  <!-- Leaflet JavaScript -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="map.js"></script>
+</body>
+</html>
