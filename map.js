@@ -37,7 +37,14 @@ let isDetailView = false;
 function initializeMap() {
   if (mapInitialized) return;
   
+  console.log("Leaflet available:", typeof L !== "undefined", "Version:", typeof L !== "undefined" ? L.version : "N/A");
   console.log('Initializing SlimShady map...');
+  const mapDiv = document.getElementById("map");
+  console.log("Map div found:", !!mapDiv, mapDiv);
+  if (!mapDiv) {
+    console.error("Map div not found!");
+    return;
+  }
   
   map = L.map('map', {
     zoomControl: false,
@@ -117,6 +124,7 @@ async function loadMapData() {
   
   try {
     console.log('Loading neighborhood data with shade statistics...');
+  console.log("mapInitialized:", mapInitialized, "map object:", !!map);
     const response = await fetch('data/neighborhoods_with_shade_stats.geojson');
     const buurtenData = await response.json();
     
