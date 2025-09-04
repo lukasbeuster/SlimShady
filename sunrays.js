@@ -1,4 +1,4 @@
-const canvas = document.getElementById('sunraysCanvas');
+const canvas = document.getElementById('sunRaysCanvas');
 const ctx = canvas.getContext('2d');
 
 // Resize canvas to full screen
