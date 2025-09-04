@@ -588,18 +588,6 @@
       scrollTimeout = setTimeout(handleScroll, 100);
     });
     
-    // Initialize map when map section becomes visible
-    let mapInitialized = false;
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting && !mapInitialized) {
-          mapInitialized = true;
-          // Initialize map here - the map.js will handle this
-        }
-      });
-    }, { threshold: 0.1 });
-    
-    observer.observe(document.getElementById('map-section'));
   </script>
 </body>
 </html>

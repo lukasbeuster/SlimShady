@@ -397,6 +397,8 @@ function checkMapVisibility() {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
+  // Also try immediate initialization in case visibility check fails
+  initializeMap();
   setTimeout(checkMapVisibility, 100);
   
   let scrollTimeout;
