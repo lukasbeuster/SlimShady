@@ -17,6 +17,16 @@ function getShadeColor(shadeIndex) {
   return SCL_COLORS.darkGreen;                   // SCL Dark Green - Excellent
 }
 
+// Neighborhood color mapping
+function getNeighborhoodColor(quality, shadeIndex) {
+  if (quality === 'No Data') return '#333333';
+  if (quality === 'Poor') return '#B71C1C';
+  if (quality === 'Acceptable') return '#FF9800';
+  if (quality === 'Very Good') return SCL_COLORS.green;
+  if (quality === 'Excellent') return SCL_COLORS.darkGreen;
+  return '#666666';
+}
+
 // Get shade category label
 function getShadeCategory(shadeIndex) {
   if (shadeIndex === undefined || shadeIndex === null) return 'Unknown';
@@ -28,11 +38,18 @@ function getShadeCategory(shadeIndex) {
 
 // Global variables
 let map = null;
-let mainSidewalksLayer = null;
+let mainDataLayer = null;
 let buurtenLayer = null;
 let currentBuurtLayer = null;
 let loadedBuurten = new Map();
 let mapInitialized = false;
+
+// Layer control variables
+let visibleLayers = {
+  'Sidewalk': true,
+  'Road': false,
+  'Cycle lane': false
+};
 
 // Initialize map only when section becomes visible
 function initializeMap() {
@@ -42,7 +59,9 @@ function initializeMap() {
   
   // Initialize map centered on Amsterdam
   map = L.map('map', {
-    zoomControl: false // We'll add custom controls
+    zoomControl: false,
+    minZoom: 10, // Prevent zooming out too far
+    maxZoom: 18
   }).setView([52.3676, 4.9041], 11);
 
   // Add custom zoom control in bottom right
@@ -56,11 +75,87 @@ function initializeMap() {
     maxZoom: 19,
     subdomains: 'abcd'
   }).addTo(map);
+
+  // Add layer control
+  createLayerControl();
   
   mapInitialized = true;
   
   // Load data
   loadMapData();
+}
+
+// Create layer control panel
+function createLayerControl() {
+  const layerControl = L.control({ position: 'topleft' });
+  
+  layerControl.onAdd = function(map) {
+    const div = L.DomUtil.create('div', 'layer-control');
+    div.style.cssText = `
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 12px;
+      min-width: 200px;
+      font-family: Inter, sans-serif;
+      font-size: 12px;
+    `;
+    
+    div.innerHTML = `
+      <div style="color: #95C11F; font-weight: 500; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">
+        Infrastructure Layers
+      </div>
+      <div class="layer-options">
+        <label style="display: block; margin-bottom: 6px; color: #fff; cursor: pointer;">
+          <input type="checkbox" id="layer-sidewalk" checked style="margin-right: 8px;">
+          <span style="color: #95C11F;">●</span> Sidewalks
+        </label>
+        <label style="display: block; margin-bottom: 6px; color: #fff; cursor: pointer;">
+          <input type="checkbox" id="layer-road" style="margin-right: 8px;">
+          <span style="color: #B71C1C;">●</span> Roads
+        </label>
+        <label style="display: block; color: #fff; cursor: pointer;">
+          <input type="checkbox" id="layer-cycle" style="margin-right: 8px;">
+          <span style="color: #FF9800;">●</span> Cycle Lanes
+        </label>
+      </div>
+      <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #333; font-size: 10px; color: #888;">
+        Note: Statistics based on sidewalk data only
+      </div>
+    `;
+    
+    // Add event listeners
+    div.querySelector('#layer-sidewalk').addEventListener('change', () => toggleLayer('Sidewalk'));
+    div.querySelector('#layer-road').addEventListener('change', () => toggleLayer('Road'));
+    div.querySelector('#layer-cycle').addEventListener('change', () => toggleLayer('Cycle lane'));
+    
+    // Prevent map interactions when clicking control
+    L.DomEvent.disableClickPropagation(div);
+    L.DomEvent.disableScrollPropagation(div);
+    
+    return div;
+  };
+  
+  layerControl.addTo(map);
+}
+
+// Toggle layer visibility
+function toggleLayer(layerType) {
+  visibleLayers[layerType] = !visibleLayers[layerType];
+  
+  if (mainDataLayer) {
+    mainDataLayer.eachLayer(layer => {
+      const feature = layer.feature;
+      if (feature.properties.Gebruiksfunctie === layerType) {
+        if (visibleLayers[layerType]) {
+          layer.addTo(map);
+        } else {
+          map.removeLayer(layer);
+        }
+      }
+    });
+  }
 }
 
 // Loading indicator functions
@@ -82,15 +177,29 @@ function hideInfoPanel() {
   document.getElementById('infoPanel').classList.remove('active');
 }
 
-// Sophisticated styling functions
-function styleMainSidewalks(feature) {
+// Styling functions
+function styleMainData(feature) {
   const shadeIndex = feature.properties.shade_availability_index_30;
+  const funcType = feature.properties.Gebruiksfunctie;
+  
+  let color = getShadeColor(shadeIndex);
+  let weight = 1.5;
+  let opacity = 0.8;
+  
+  // Adjust styling based on function type
+  if (funcType === 'Road') {
+    weight = 2;
+    opacity = 0.6;
+  } else if (funcType === 'Cycle lane') {
+    weight = 1;
+    opacity = 0.7;
+  }
   
   return {
-    color: getShadeColor(shadeIndex),
-    weight: 1.5,
-    opacity: 0.8,
-    fillColor: getShadeColor(shadeIndex),
+    color: color,
+    weight: weight,
+    opacity: opacity,
+    fillColor: color,
     fillOpacity: 0.6
   };
 }
@@ -108,53 +217,77 @@ function styleDetailedSidewalks(feature) {
 }
 
 function styleBuurten(feature) {
+  const quality = feature.properties.shade_quality;
+  const shadeIndex = feature.properties.shade_availability_index_30_mean;
+  
   return {
-    color: SCL_COLORS.green,
-    weight: 1,
-    opacity: 0.7,
-    fillColor: 'transparent',
-    fillOpacity: 0
+    color: getNeighborhoodColor(quality, shadeIndex),
+    weight: 1.5,
+    opacity: 0.8,
+    fillColor: getNeighborhoodColor(quality, shadeIndex),
+    fillOpacity: 0.3
   };
 }
 
-// Load main sidewalks data
+// Load main data with filtering capability
 async function loadMainData() {
   showLoading();
   
   try {
-    console.log('Loading main sidewalks data...');
-    const response = await fetch('data/sidewalks_web_minimal.geojson');
+    console.log('Loading infrastructure data...');
+    const response = await fetch('data/sidewalks_with_functions.geojson');
     const mainData = await response.json();
     
     console.log('Main data loaded:', mainData.features.length, 'features');
     
-    mainSidewalksLayer = L.geoJSON(mainData, {
-      style: styleMainSidewalks,
-      onEachFeature: (feature, layer) => {
-        const shadeIndex = feature.properties.shade_availability_index_30;
-        const guid = feature.properties.Guid;
-        const category = getShadeCategory(shadeIndex);
-        
-        layer.bindTooltip(`
-          <div style="font-family: Inter, sans-serif;">
-            <div style="font-weight: 500; color: #95C11F; margin-bottom: 4px;">Shade Analysis</div>
-            <div>Category: <strong>${category}</strong></div>
-            <div>Index: <strong>${shadeIndex?.toFixed(2) || 'N/A'}</strong></div>
-            <div style="font-size: 11px; color: #888; margin-top: 4px;">ID: ${guid || 'N/A'}</div>
-          </div>
-        `, { 
-          permanent: false, 
-          direction: 'top',
-          className: 'custom-tooltip'
-        });
-      }
-    }).addTo(map);
+    // Create layer group
+    mainDataLayer = L.layerGroup();
     
-    console.log('Main sidewalks layer added successfully');
+    // Process each feature
+    mainData.features.forEach(feature => {
+      const funcType = feature.properties.Gebruiksfunctie;
+      const shadeIndex = feature.properties.shade_availability_index_30;
+      const guid = feature.properties.Guid;
+      const category = getShadeCategory(shadeIndex);
+      
+      const layer = L.geoJSON(feature, {
+        style: styleMainData,
+        onEachFeature: (feature, layer) => {
+          layer.bindTooltip(`
+            <div style="font-family: Inter, sans-serif;">
+              <div style="font-weight: 500; color: #95C11F; margin-bottom: 4px;">Shade Analysis</div>
+              <div>Type: <strong>${funcType}</strong></div>
+              <div>Category: <strong>${category}</strong></div>
+              <div>Index: <strong>${shadeIndex?.toFixed(2) || 'N/A'}</strong></div>
+              <div style="font-size: 11px; color: #888; margin-top: 4px;">ID: ${guid || 'N/A'}</div>
+            </div>
+          `, { 
+            permanent: false, 
+            direction: 'top',
+            className: 'custom-tooltip'
+          });
+        }
+      });
+      
+      // Add to main layer group
+      layer.addTo(mainDataLayer);
+      
+      // Initially show only sidewalks
+      if (funcType === 'Sidewalk' && visibleLayers[funcType]) {
+        layer.addTo(map);
+      }
+    });
+    
+    console.log('Infrastructure layers created');
     
     // Fit map to data bounds
-    if (mainSidewalksLayer.getBounds().isValid()) {
-      map.fitBounds(mainSidewalksLayer.getBounds(), { padding: [20, 20] });
+    if (mainDataLayer.getBounds && Object.keys(mainDataLayer._layers).length > 0) {
+      map.fitBounds(mainDataLayer.getBounds(), { padding: [20, 20] });
+      
+      // Set max bounds to prevent infinite scroll
+      const bounds = mainDataLayer.getBounds();
+      const extendedBounds = bounds.pad(0.1); // Add 10% padding
+      map.setMaxBounds(extendedBounds);
     }
     
   } catch (error) {
@@ -164,11 +297,11 @@ async function loadMainData() {
   }
 }
 
-// Load neighborhood boundaries
+// Load neighborhood boundaries with statistics
 async function loadBuurten() {
   try {
-    console.log('Loading neighborhood boundaries...');
-    const response = await fetch('data/geojson_lnglat.json');
+    console.log('Loading neighborhood boundaries with statistics...');
+    const response = await fetch('data/neighborhoods_with_shade_stats.geojson');
     const buurtenData = await response.json();
     
     console.log('Neighborhood data loaded:', buurtenData.features.length, 'features');
@@ -179,12 +312,20 @@ async function loadBuurten() {
         const props = feature.properties;
         const buurtName = props.Buurt || 'Unknown';
         const buurtCode = props.Buurtcode || props.CBS_Buurtcode || 'N/A';
+        const quality = props.shade_quality || 'No Data';
+        const meanShade = props.shade_availability_index_30_mean || 0;
+        const segmentCount = props.shade_availability_index_30_count || 0;
+        const coverage = props.coverage_excellent || 0;
         
         layer.bindTooltip(`
           <div style="font-family: Inter, sans-serif;">
             <div style="font-weight: 500; color: #95C11F; margin-bottom: 4px;">${buurtName}</div>
-            <div>Code: <strong>${buurtCode}</strong></div>
-            <div style="font-size: 11px; color: #888; margin-top: 4px;">Click for detailed analysis</div>
+            <div>Quality: <strong style="color: ${getNeighborhoodColor(quality, meanShade)};">${quality}</strong></div>
+            <div>Avg. Index: <strong>${meanShade.toFixed(2)}</strong></div>
+            <div>Coverage: <strong>${coverage.toFixed(1)}%</strong></div>
+            <div style="font-size: 11px; color: #888; margin-top: 4px;">
+              ${segmentCount} sidewalk segments | Click for details
+            </div>
           </div>
         `, { 
           permanent: false, 
@@ -194,7 +335,7 @@ async function loadBuurten() {
 
         layer.on('mouseover', (e) => {
           layer.setStyle({ 
-            fillOpacity: 0.2, 
+            fillOpacity: 0.6, 
             opacity: 1.0,
             weight: 2
           });
@@ -217,12 +358,11 @@ async function loadBuurten() {
   }
 }
 
-// Load detailed neighborhood data
+// Load detailed neighborhood data (unchanged from previous implementation)
 async function loadBuurtDetails(buurtCode, buurtName, buurtLayer) {
   showLoading();
   
   try {
-    // Check cache first
     if (loadedBuurten.has(buurtCode)) {
       console.log('Using cached data for', buurtCode);
       displayBuurtData(loadedBuurten.get(buurtCode), buurtName, buurtLayer);
@@ -239,9 +379,7 @@ async function loadBuurtDetails(buurtCode, buurtName, buurtLayer) {
     const detailedData = await response.json();
     console.log(`Loaded ${detailedData.features.length} detailed features for ${buurtName}`);
     
-    // Cache the data
     loadedBuurten.set(buurtCode, detailedData);
-    
     displayBuurtData(detailedData, buurtName, buurtLayer);
     
   } catch (error) {
@@ -249,12 +387,12 @@ async function loadBuurtDetails(buurtCode, buurtName, buurtLayer) {
     showInfoPanel(`
       <div class="info-title">${buurtName}</div>
       <div style="color: #FF5722; margin: 12px 0;">
-        <strong>Data Unavailable</strong>
+        <strong>Detailed Data Unavailable</strong>
       </div>
       <div style="color: #888888; font-size: 12px;">
-        No detailed shade analysis available for this neighborhood.
+        Neighborhood-level statistics are available, but detailed segment analysis is not provided for this area.
         <br><br>
-        <em>Error: ${error.message}</em>
+        <em>This may be due to data processing constraints or the area being outside the detailed analysis scope.</em>
       </div>
     `);
   } finally {
@@ -262,19 +400,19 @@ async function loadBuurtDetails(buurtCode, buurtName, buurtLayer) {
   }
 }
 
-// Display detailed neighborhood analysis
+// Display detailed neighborhood analysis (same as before)
 function displayBuurtData(buurtData, buurtName, buurtLayer) {
-  // Remove previous detail layer
   if (currentBuurtLayer) {
     map.removeLayer(currentBuurtLayer);
   }
   
-  // Hide main layer for clarity
-  if (mainSidewalksLayer) {
-    map.removeLayer(mainSidewalksLayer);
+  if (mainDataLayer) {
+    map.removeLayer(mainDataLayer);
+  }
+  if (buurtenLayer) {
+    map.removeLayer(buurtenLayer);
   }
   
-  // Create new detailed layer
   currentBuurtLayer = L.geoJSON(buurtData, {
     style: styleDetailedSidewalks,
     onEachFeature: (feature, layer) => {
@@ -298,10 +436,8 @@ function displayBuurtData(buurtData, buurtName, buurtLayer) {
     }
   }).addTo(map);
   
-  // Zoom to neighborhood bounds
   map.fitBounds(buurtLayer.getBounds(), { padding: [50, 50] });
 
-  // Calculate sophisticated statistics
   const features = buurtData.features;
   const shadeValues = features
     .map(f => f.properties.shade_availability_index_30)
@@ -314,7 +450,6 @@ function displayBuurtData(buurtData, buurtName, buurtLayer) {
   const stdDev = shadeValues.length > 1 ? 
     Math.sqrt(shadeValues.reduce((sum, val) => sum + Math.pow(val - avgShade, 2), 0) / shadeValues.length) : 0;
   
-  // Category distribution
   const poorShade = shadeValues.filter(val => val < 0.5).length;
   const acceptableShade = shadeValues.filter(val => val >= 0.5 && val < 0.7).length;
   const veryGoodShade = shadeValues.filter(val => val >= 0.7 && val < 0.9).length;
@@ -386,11 +521,23 @@ function showMainView() {
     currentBuurtLayer = null;
   }
   
-  if (mainSidewalksLayer) {
-    mainSidewalksLayer.addTo(map);
-    if (mainSidewalksLayer.getBounds().isValid()) {
-      map.fitBounds(mainSidewalksLayer.getBounds(), { padding: [20, 20] });
-    }
+  // Restore main layers
+  if (buurtenLayer) {
+    buurtenLayer.addTo(map);
+  }
+  if (mainDataLayer) {
+    // Re-apply layer visibility filters
+    mainDataLayer.eachLayer(layer => {
+      const funcType = layer.feature.properties.Gebruiksfunctie;
+      if (visibleLayers[funcType]) {
+        layer.addTo(map);
+      }
+    });
+  }
+  
+  // Reset bounds
+  if (mainDataLayer && Object.keys(mainDataLayer._layers).length > 0) {
+    map.fitBounds(mainDataLayer.getBounds(), { padding: [20, 20] });
   }
   
   hideInfoPanel();
@@ -419,17 +566,14 @@ function checkMapVisibility() {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-  // Check initial visibility
   setTimeout(checkMapVisibility, 100);
   
-  // Listen for scroll events
   let scrollTimeout;
   window.addEventListener('scroll', () => {
     if (scrollTimeout) clearTimeout(scrollTimeout);
     scrollTimeout = setTimeout(checkMapVisibility, 50);
   });
   
-  // Also initialize if user scrolls to map section
   const mapSectionObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting && !mapInitialized) {
@@ -444,4 +588,4 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-console.log('SlimShady unified page loaded');
+console.log('SlimShady enhanced map loaded');
