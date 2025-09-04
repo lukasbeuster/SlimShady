@@ -31,12 +31,11 @@
         }
 
         /* Landing Section */
-        .landing-section {
+        .hero-section {
             height: 100vh;
             position: relative;
             display: flex;
             align-items: center;
-            justify-content: center;
             background: var(--scl-background);
         }
 
@@ -49,16 +48,16 @@
             z-index: 1;
         }
 
-        .content {
+        .hero-content {
             position: relative;
             z-index: 2;
             max-width: 600px;
-            padding: 2rem;
+            margin-left: 10%;
             opacity: 0;
             animation: fadeInUp 1.5s ease-out 0.5s forwards;
         }
 
-        .title {
+        .hero-title {
             font-size: 4rem;
             font-weight: 300;
             margin-bottom: 1rem;
@@ -69,7 +68,7 @@
             background-clip: text;
         }
 
-        .subtitle {
+        .hero-subtitle {
             font-size: 1.2rem;
             margin-bottom: 2rem;
             color: #cccccc;
@@ -78,13 +77,13 @@
             line-height: 1.5;
         }
 
-        .cta-links {
+        .hero-nav {
             display: flex;
             gap: 1.5rem;
             flex-wrap: wrap;
         }
 
-        .cta-link {
+        .hero-link {
             display: inline-flex;
             align-items: center;
             padding: 0.75rem 1.5rem;
@@ -98,7 +97,7 @@
             letter-spacing: 0.05em;
         }
 
-        .cta-link:hover {
+        .hero-link:hover {
             background: var(--scl-green);
             color: var(--scl-background);
             transform: translateY(-2px);
@@ -120,109 +119,6 @@
             font-size: 1.5rem;
             color: var(--scl-green);
             animation: bounce 2s infinite;
-        }
-
-        /* Concept Section */
-        .concept-section {
-            min-height: 100vh;
-            padding: 4rem 0;
-            background: linear-gradient(180deg, var(--scl-background) 0%, #111111 100%);
-        }
-
-        .concept-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        .section-title {
-            font-size: 3rem;
-            font-weight: 300;
-            margin-bottom: 2rem;
-            text-align: center;
-            color: var(--scl-green);
-            letter-spacing: -0.02em;
-        }
-
-        .concept-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            margin-bottom: 4rem;
-            align-items: center;
-        }
-
-        .concept-text {
-            font-size: 1.1rem;
-            color: #cccccc;
-            line-height: 1.7;
-        }
-
-        .concept-text h3 {
-            color: var(--scl-green);
-            margin-bottom: 1rem;
-            font-weight: 500;
-        }
-
-        .concept-text p {
-            margin-bottom: 1.5rem;
-        }
-
-        .concept-visual {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 2rem;
-            text-align: center;
-            backdrop-filter: blur(10px);
-        }
-
-        .placeholder-image {
-            width: 100%;
-            height: 300px;
-            background: linear-gradient(135deg, #222 0%, #333 100%);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--scl-green);
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .visual-caption {
-            font-size: 0.9rem;
-            color: #888;
-            font-style: italic;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
-        .feature-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 2rem;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-
-        .feature-card:hover {
-            border-color: var(--scl-green);
-            transform: translateY(-2px);
-        }
-
-        .feature-card h4 {
-            color: var(--scl-green);
-            margin-bottom: 1rem;
-            font-weight: 500;
         }
 
         /* Map Section */
@@ -267,46 +163,116 @@
         #map {
             width: 100%;
             height: 100%;
+            padding-top: 60px;
             background: var(--scl-background);
+        }
+
+        /* Legend */
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            z-index: 1000;
+            min-width: 200px;
+        }
+
+        .legend-title {
+            color: var(--scl-green);
+            font-weight: 500;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+            color: #cccccc;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 2px;
+            margin-right: 8px;
         }
 
         /* Info Panel */
         #infoPanel {
             position: absolute;
-            top: 80px;
-            right: 20px;
-            width: 350px;
-            max-height: calc(100vh - 120px);
+            bottom: 20px;
+            left: 20px;
+            width: 320px;
+            max-height: 400px;
             background: rgba(0, 0, 0, 0.9);
             backdrop-filter: blur(15px);
             border: 1px solid #333;
-            border-radius: 12px;
+            border-radius: 8px;
             padding: 0;
-            transform: translateX(400px);
+            transform: translateY(500px);
             transition: transform 0.3s ease;
             z-index: 1000;
             overflow: hidden;
         }
 
         #infoPanel.active {
-            transform: translateX(0);
+            transform: translateY(0);
         }
 
         .info-title {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: 500;
             color: var(--scl-green);
-            padding: 20px 20px 0 20px;
+            padding: 16px 16px 0 16px;
             border-bottom: 1px solid #333;
             margin-bottom: 0;
-            background: rgba(149, 193, 31, 0.1);
         }
 
-        .info-stats {
-            padding: 20px;
-            max-height: calc(100vh - 200px);
+        .info-content {
+            padding: 16px;
+            max-height: 320px;
             overflow-y: auto;
             color: #cccccc;
+            font-size: 13px;
+        }
+
+        .info-stat {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .info-stat-label {
+            color: #888;
+        }
+
+        .info-stat-value {
+            color: var(--scl-text);
+            font-weight: 500;
+        }
+
+        .close-info {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .close-info:hover {
+            color: var(--scl-text);
         }
 
         /* Loading Indicator */
@@ -330,77 +296,15 @@
             visibility: visible;
         }
 
-        /* References Section */
-        .references-section {
-            min-height: 70vh;
-            padding: 4rem 0;
-            background: linear-gradient(180deg, #111111 0%, #1a1a1a 100%);
-        }
-
-        .references-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        .references-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
-        .reference-category {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 2rem;
-            backdrop-filter: blur(10px);
-        }
-
-        .reference-category h4 {
-            color: var(--scl-green);
-            margin-bottom: 1.5rem;
-            font-weight: 500;
-        }
-
-        .reference-list {
-            list-style: none;
-        }
-
-        .reference-list li {
-            margin-bottom: 1rem;
-            padding-left: 1rem;
-            position: relative;
-        }
-
-        .reference-list li::before {
-            content: '→';
-            position: absolute;
-            left: 0;
-            color: var(--scl-green);
-        }
-
-        .reference-list a {
-            color: #cccccc;
-            text-decoration: none;
-            transition: color 0.3s ease;
-            font-size: 0.9rem;
-        }
-
-        .reference-list a:hover {
-            color: var(--scl-green);
-        }
-
         /* Custom Tooltip */
         .custom-tooltip {
             background: rgba(0, 0, 0, 0.9) !important;
             border: 1px solid #333 !important;
-            border-radius: 8px !important;
+            border-radius: 4px !important;
             color: #ffffff !important;
             font-family: 'Inter', sans-serif !important;
-            padding: 12px !important;
-            backdrop-filter: blur(10px);
+            font-size: 12px !important;
+            padding: 8px !important;
         }
 
         .leaflet-tooltip-left.custom-tooltip::before {
@@ -444,40 +348,32 @@
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .title {
+            .hero-title {
                 font-size: 2.5rem;
             }
 
-            .subtitle {
+            .hero-subtitle {
                 font-size: 1rem;
             }
 
-            .content {
-                padding: 1rem;
-                text-align: center;
+            .hero-content {
+                margin-left: 5%;
+                margin-right: 5%;
+                text-align: left;
             }
 
-            .cta-links {
-                justify-content: center;
-            }
-
-            .concept-grid {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
-
-            .features-grid {
-                grid-template-columns: 1fr;
+            .hero-nav {
+                justify-content: flex-start;
             }
 
             #infoPanel {
                 width: calc(100vw - 40px);
+                left: 20px;
                 right: 20px;
-                transform: translateY(100vh);
             }
 
-            #infoPanel.active {
-                transform: translateY(0);
+            .legend {
+                bottom: 90px;
             }
 
             .map-header {
@@ -491,91 +387,20 @@
     </style>
 </head>
 <body>
-    <!-- Landing Section -->
-    <section class="landing-section">
+    <!-- Hero Section -->
+    <section class="hero-section">
         <canvas id="sunraysCanvas"></canvas>
-        <div class="content">
-            <h1 class="title">SlimShady</h1>
-            <p class="subtitle">
+        <div class="hero-content">
+            <h1 class="hero-title">SlimShady</h1>
+            <p class="hero-subtitle">
                 Mapping urban shade availability across Amsterdam's infrastructure. 
-                Explore how trees, buildings, and urban design create cooler, more comfortable pedestrian spaces.
+                Understanding how trees, buildings, and urban design create cooler, more comfortable pedestrian spaces.
             </p>
-            <div class="cta-links">
-                <a href="#concept-section" class="cta-link">Learn More</a>
-                <a href="#map-section" class="cta-link">Explore Map</a>
+            <div class="hero-nav">
+                <a href="#map-section" class="hero-link">Explore Map</a>
             </div>
         </div>
-        <div class="scroll-indicator" onclick="scrollToSection('#concept-section')"></div>
-    </section>
-
-    <!-- Concept Explanation Section -->
-    <section id="concept-section" class="concept-section">
-        <div class="concept-container">
-            <h2 class="section-title">Understanding Urban Shade</h2>
-            
-            <div class="concept-grid">
-                <div class="concept-text">
-                    <h3>The Challenge</h3>
-                    <p>As cities become increasingly dense and climate change intensifies urban heat, shade has become a crucial factor in pedestrian comfort and public health. Amsterdam's urban infrastructure varies dramatically in its ability to provide shade throughout the day.</p>
-                    
-                    <h3>Our Approach</h3>
-                    <p>SlimShady analyzes shade availability across Amsterdam's sidewalks, roads, and cycle lanes using high-resolution spatial data and shadow modeling. We calculate shade availability indices that account for varying sun positions throughout the day, providing a comprehensive view of urban comfort zones.</p>
-                </div>
-                
-                <div class="concept-visual">
-                    <div class="placeholder-image">
-                        Interactive Map Overview<br>
-                        <small style="margin-top: 10px; display: block; font-size: 0.7rem; opacity: 0.7;">
-                            Neighborhoods colored by shade quality
-                        </small>
-                    </div>
-                    <div class="visual-caption">
-                        Amsterdam neighborhoods colored by average shade quality: Poor (red), Acceptable (orange), Very Good (green), Excellent (dark green)
-                    </div>
-                </div>
-            </div>
-
-            <div class="concept-grid" style="margin-top: 3rem;">
-                <div class="concept-visual">
-                    <div class="placeholder-image">
-                        Detailed Neighborhood View<br>
-                        <small style="margin-top: 10px; display: block; font-size: 0.7rem; opacity: 0.7;">
-                            Individual segment analysis
-                        </small>
-                    </div>
-                    <div class="visual-caption">
-                        Detailed view showing individual sidewalk segments with precise shade availability measurements
-                    </div>
-                </div>
-                
-                <div class="concept-text">
-                    <h3>How to Use the Map</h3>
-                    <p><strong>Overview Mode:</strong> Neighborhoods are colored by their average shade quality. Click any area to dive deeper into the analysis.</p>
-                    <p><strong>Infrastructure Layers:</strong> Toggle between sidewalks, roads, and cycle lanes using the layer control. Statistics focus on sidewalk data for pedestrian comfort.</p>
-                    <p><strong>Detailed Analysis:</strong> Click on neighborhoods to see individual segment analysis, statistical summaries, and shade distribution metrics.</p>
-                    
-                    <h3>Interpreting Results</h3>
-                    <p>Shade indices range from 0.0 (no shade) to 1.0 (complete shade). Our categories help interpret livability: Poor (0-0.5), Acceptable (0.5-0.7), Very Good (0.7-0.9), and Excellent (0.9-1.0) shading.</p>
-                </div>
-            </div>
-
-            <div class="features-grid">
-                <div class="feature-card">
-                    <h4>Multi-layered Analysis</h4>
-                    <p>Explore shade patterns across sidewalks, roads, and cycle lanes. Each infrastructure type provides different insights into urban comfort and mobility.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <h4>Neighborhood Statistics</h4>
-                    <p>View comprehensive statistics including mean shade indices, coverage percentages, and distribution metrics for informed urban planning decisions.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <h4>Real-time Interaction</h4>
-                    <p>Click neighborhoods for detailed breakdowns, toggle infrastructure layers, and explore shade patterns at multiple scales from city-wide to individual segments.</p>
-                </div>
-            </div>
-        </div>
+        <div class="scroll-indicator" onclick="scrollToMap()"></div>
     </section>
 
     <!-- Map Section -->
@@ -584,12 +409,39 @@
             <div class="map-title">SlimShady - Interactive Shade Analysis</div>
             <a href="#" class="back-to-top" onclick="scrollToTop()">↑ Back to Top</a>
         </div>
-        <div id="map"></div>
         
+        <div id="map"></div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-title">Shade Quality</div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #5B7026;"></div>
+                <span>Excellent (0.9-1.0)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #95C11F;"></div>
+                <span>Very Good (0.7-0.9)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #FF9800;"></div>
+                <span>Acceptable (0.5-0.7)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #B71C1C;"></div>
+                <span>Poor Shading (0-0.5)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #333333;"></div>
+                <span>No Data</span>
+            </div>
+        </div>
+
         <!-- Info Panel -->
         <div id="infoPanel">
-            <div class="info-title">Neighborhood Analysis</div>
-            <div id="buurtInfo" class="info-stats">
+            <button class="close-info" onclick="hideInfoPanel()">×</button>
+            <div class="info-title" id="infoTitle">Neighborhood</div>
+            <div class="info-content" id="infoContent">
                 Click on a neighborhood to view detailed shade analysis...
             </div>
         </div>
@@ -600,71 +452,14 @@
         </div>
     </section>
 
-    <!-- References Section -->
-    <section class="references-section">
-        <div class="references-container">
-            <h2 class="section-title">Resources & Methodology</h2>
-            
-            <div class="references-grid">
-                <div class="reference-category">
-                    <h4>Research & Methodology</h4>
-                    <ul class="reference-list">
-                        <li><a href="https://senseable.mit.edu/" target="_blank">MIT Senseable City Lab</a></li>
-                        <li><a href="https://www.nature.com/articles/s41586-021-03947-9" target="_blank">Urban Heat Island Research (Nature)</a></li>
-                        <li><a href="https://doi.org/10.1016/j.landurbplan.2019.103667" target="_blank">Shadow Modeling in Urban Planning</a></li>
-                        <li><a href="https://www.who.int/news-room/fact-sheets/detail/climate-change-heat-and-health" target="_blank">WHO Climate Change & Health</a></li>
-                    </ul>
-                </div>
-
-                <div class="reference-category">
-                    <h4>Data Sources</h4>
-                    <ul class="reference-list">
-                        <li><a href="https://www.amsterdam.nl/bestuur-organisatie/organisatie/ruimte-economie/ruimte-duurzaamheid/geo-informatie/" target="_blank">Amsterdam Geo-Information</a></li>
-                        <li><a href="https://www.pdok.nl/" target="_blank">PDOK - Dutch Geospatial Data</a></li>
-                        <li><a href="https://3dbag.nl/" target="_blank">3D BAG Building Models</a></li>
-                        <li><a href="https://www.cbs.nl/nl-nl/dossier/nederland-regionaal/geografische-data" target="_blank">CBS Geographic Data</a></li>
-                    </ul>
-                </div>
-
-                <div class="reference-category">
-                    <h4>Technical Implementation</h4>
-                    <ul class="reference-list">
-                        <li><a href="https://leafletjs.com/" target="_blank">Leaflet.js Mapping Library</a></li>
-                        <li><a href="https://geopandas.org/" target="_blank">GeoPandas Spatial Analysis</a></li>
-                        <li><a href="https://www.openstreetmap.org/" target="_blank">OpenStreetMap Base Data</a></li>
-                        <li><a href="https://carto.com/" target="_blank">CartoDB Dark Basemap</a></li>
-                    </ul>
-                </div>
-
-                <div class="reference-category">
-                    <h4>Urban Planning Context</h4>
-                    <ul class="reference-list">
-                        <li><a href="https://www.amsterdam.nl/en/policy/sustainability/" target="_blank">Amsterdam Climate Strategy</a></li>
-                        <li><a href="https://www.urbangreenbluegrids.com/" target="_blank">Urban Green-Blue Infrastructure</a></li>
-                        <li><a href="https://www.c40.org/what-we-do/building-efficiency/cooling/" target="_blank">C40 Urban Cooling Strategies</a></li>
-                        <li><a href="https://github.com/lukasbeuster/SlimShady" target="_blank">Project Repository (GitHub)</a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <div style="text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #333; color: #666; font-size: 0.9rem;">
-                <p>SlimShady - Urban Shade Analysis © 2024 | Developed with MIT Senseable City Lab methodology</p>
-                <p style="margin-top: 0.5rem;">
-                    <a href="https://github.com/lukasbeuster/SlimShady" style="color: var(--scl-green);" target="_blank">View Source Code</a>
-                </p>
-            </div>
-        </div>
-    </section>
-
     <!-- Scripts -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="sunrays.js"></script>
     <script src="map.js"></script>
 
     <script>
-        // Smooth scrolling functions
-        function scrollToSection(selector) {
-            document.querySelector(selector).scrollIntoView({
+        function scrollToMap() {
+            document.getElementById('map-section').scrollIntoView({
                 behavior: 'smooth'
             });
         }
@@ -675,22 +470,6 @@
                 behavior: 'smooth'
             });
         }
-
-        // Handle smooth scrolling for navigation links
-        document.addEventListener('DOMContentLoaded', function() {
-            const links = document.querySelectorAll('a[href^="#"]');
-            links.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth'
-                        });
-                    }
-                });
-            });
-        });
     </script>
 </body>
 </html>
