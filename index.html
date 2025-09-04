@@ -1,475 +1,605 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SlimShady - Urban Shade Analysis Amsterdam</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --scl-green: #95C11F;
-            --scl-dark-green: #5B7026;
-            --scl-background: #000000;
-            --scl-text: #ffffff;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--scl-background);
-            color: var(--scl-text);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* Landing Section */
-        .hero-section {
-            height: 100vh;
-            position: relative;
-            display: flex;
-            align-items: center;
-            background: var(--scl-background);
-        }
-
-        #sunraysCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            max-width: 600px;
-            margin-left: 10%;
-            opacity: 0;
-            animation: fadeInUp 1.5s ease-out 0.5s forwards;
-        }
-
-        .hero-title {
-            font-size: 4rem;
-            font-weight: 300;
-            margin-bottom: 1rem;
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, var(--scl-green), #a8d63f);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero-subtitle {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            color: #cccccc;
-            font-weight: 300;
-            max-width: 500px;
-            line-height: 1.5;
-        }
-
-        .hero-nav {
-            display: flex;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .hero-link {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.75rem 1.5rem;
-            color: var(--scl-green);
-            text-decoration: none;
-            border: 1px solid var(--scl-green);
-            transition: all 0.3s ease;
-            font-weight: 300;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .hero-link:hover {
-            background: var(--scl-green);
-            color: var(--scl-background);
-            transform: translateY(-2px);
-        }
-
-        .scroll-indicator {
-            position: absolute;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            cursor: pointer;
-            z-index: 2;
-            opacity: 0;
-            animation: fadeIn 1s ease-out 2s forwards;
-        }
-
-        .scroll-indicator::before {
-            content: '↓';
-            font-size: 1.5rem;
-            color: var(--scl-green);
-            animation: bounce 2s infinite;
-        }
-
-        /* Map Section */
-        .map-section {
-            height: 100vh;
-            position: relative;
-            background: var(--scl-background);
-        }
-
-        .map-header {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid #333;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .map-title {
-            font-size: 1.2rem;
-            font-weight: 300;
-            color: var(--scl-green);
-        }
-
-        .back-to-top {
-            color: var(--scl-text);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.3s ease;
-        }
-
-        .back-to-top:hover {
-            color: var(--scl-green);
-        }
-
-        #map {
-            width: 100%;
-            height: 100%;
-            padding-top: 60px;
-            background: var(--scl-background);
-        }
-
-        /* Legend */
-        .legend {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 16px;
-            font-family: 'Inter', sans-serif;
-            font-size: 12px;
-            z-index: 1000;
-            min-width: 200px;
-        }
-
-        .legend-title {
-            color: var(--scl-green);
-            font-weight: 500;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 4px;
-            color: #cccccc;
-        }
-
-        .legend-color {
-            width: 16px;
-            height: 16px;
-            border-radius: 2px;
-            margin-right: 8px;
-        }
-
-        /* Info Panel */
-        #infoPanel {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            width: 320px;
-            max-height: 400px;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(15px);
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 0;
-            transform: translateY(500px);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-            overflow: hidden;
-        }
-
-        #infoPanel.active {
-            transform: translateY(0);
-        }
-
-        .info-title {
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: var(--scl-green);
-            padding: 16px 16px 0 16px;
-            border-bottom: 1px solid #333;
-            margin-bottom: 0;
-        }
-
-        .info-content {
-            padding: 16px;
-            max-height: 320px;
-            overflow-y: auto;
-            color: #cccccc;
-            font-size: 13px;
-        }
-
-        .info-stat {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 6px;
-        }
-
-        .info-stat-label {
-            color: #888;
-        }
-
-        .info-stat-value {
-            color: var(--scl-text);
-            font-weight: 500;
-        }
-
-        .close-info {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: none;
-            border: none;
-            color: #888;
-            cursor: pointer;
-            font-size: 16px;
-            transition: color 0.3s ease;
-        }
-
-        .close-info:hover {
-            color: var(--scl-text);
-        }
-
-        /* Loading Indicator */
-        #loadingIndicator {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 2000;
-            background: rgba(0, 0, 0, 0.8);
-            color: var(--scl-green);
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-
-        #loadingIndicator.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* Custom Tooltip */
-        .custom-tooltip {
-            background: rgba(0, 0, 0, 0.9) !important;
-            border: 1px solid #333 !important;
-            border-radius: 4px !important;
-            color: #ffffff !important;
-            font-family: 'Inter', sans-serif !important;
-            font-size: 12px !important;
-            padding: 8px !important;
-        }
-
-        .leaflet-tooltip-left.custom-tooltip::before {
-            border-left-color: rgba(0, 0, 0, 0.9) !important;
-        }
-
-        .leaflet-tooltip-right.custom-tooltip::before {
-            border-right-color: rgba(0, 0, 0, 0.9) !important;
-        }
-
-        .leaflet-tooltip-top.custom-tooltip::before {
-            border-top-color: rgba(0, 0, 0, 0.9) !important;
-        }
-
-        .leaflet-tooltip-bottom.custom-tooltip::before {
-            border-bottom-color: rgba(0, 0, 0, 0.9) !important;
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-10px); }
-            60% { transform: translateY(-5px); }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .hero-title {
-                font-size: 2.5rem;
-            }
-
-            .hero-subtitle {
-                font-size: 1rem;
-            }
-
-            .hero-content {
-                margin-left: 5%;
-                margin-right: 5%;
-                text-align: left;
-            }
-
-            .hero-nav {
-                justify-content: flex-start;
-            }
-
-            #infoPanel {
-                width: calc(100vw - 40px);
-                left: 20px;
-                right: 20px;
-            }
-
-            .legend {
-                bottom: 90px;
-            }
-
-            .map-header {
-                padding: 0.5rem 1rem;
-            }
-
-            .map-title {
-                font-size: 1rem;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Throwing Shade | Urban Shade Analysis</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #000000;
+      color: #ffffff;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    
+    /* Landing Section */
+    .hero-section {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    
+    #sunRaysCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      background: #1a1a1a;
+    }
+    
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 0;
+    }
+    
+    .header {
+      padding: 40px 60px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    
+    .logo {
+      font-size: 28px;
+      font-weight: 600;
+      color: #95C11F;
+      letter-spacing: -0.02em;
+    }
+    
+    .header-info {
+      text-align: right;
+      color: #cccccc;
+      font-size: 14px;
+      font-weight: 300;
+      line-height: 1.4;
+    }
+    
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 60px;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    
+    .title {
+      font-size: clamp(48px, 6vw, 84px);
+      font-weight: 300;
+      color: #ffffff;
+      letter-spacing: -0.03em;
+      line-height: 0.95;
+      margin-bottom: 24px;
+    }
+    
+    .subtitle {
+      font-size: 20px;
+      font-weight: 400;
+      color: #95C11F;
+      margin-bottom: 32px;
+      max-width: 600px;
+    }
+    
+    .description {
+      font-size: 16px;
+      font-weight: 300;
+      color: #cccccc;
+      max-width: 500px;
+      line-height: 1.7;
+      margin-bottom: 48px;
+    }
+    
+    .scroll-indicator {
+      position: absolute;
+      bottom: 40px;
+      left: 60px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #888888;
+      font-size: 12px;
+      font-weight: 300;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    
+    .scroll-indicator:hover {
+      color: #95C11F;
+    }
+    
+    .scroll-arrow {
+      width: 1px;
+      height: 40px;
+      background: #95C11F;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .scroll-arrow::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 8px;
+      background: #95C11F;
+      animation: scroll-pulse 2s infinite ease-in-out;
+    }
+    
+    @keyframes scroll-pulse {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(32px); }
+    }
+    
+    /* Map Section */
+    .map-section {
+      min-height: 100vh;
+      background: #000000;
+      position: relative;
+    }
+    
+    .map-header {
+      background: #000000;
+      border-bottom: 1px solid #333333;
+      padding: 20px 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    
+    .map-title {
+      font-size: 18px;
+      font-weight: 500;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .back-to-top {
+      color: #888888;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 300;
+      border: 1px solid #333333;
+      padding: 8px 16px;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    
+    .back-to-top:hover {
+      border-color: #95C11F;
+      color: #95C11F;
+    }
+    
+    .map-container {
+      height: calc(100vh - 81px);
+      position: relative;
+    }
+    
+    #map {
+      height: 100%;
+      width: 100%;
+    }
+    
+    /* Map Controls */
+    .map-controls {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .control-panel {
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(10px);
+      border: 1px solid #333333;
+      padding: 16px;
+      min-width: 280px;
+      font-size: 13px;
+      color: #cccccc;
+    }
+    
+    .control-title {
+      font-weight: 500;
+      color: #95C11F;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .legend-color {
+      width: 16px;
+      height: 12px;
+      border: 1px solid #555555;
+    }
+    
+    /* Info Panel */
+    .info-panel {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid #333333;
+      padding: 20px;
+      max-width: 400px;
+      min-width: 300px;
+      transform: translateY(100%);
+      opacity: 0;
+      transition: all 0.3s ease;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    
+    .info-panel.active {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    .info-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: #95C11F;
+      margin-bottom: 12px;
+    }
+    
+    .info-stats {
+      color: #cccccc;
+      margin-bottom: 16px;
+    }
+    
+    .info-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: #888888;
+      font-size: 18px;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    
+    .info-close:hover {
+      color: #95C11F;
+    }
+    
+    /* Loading Indicator */
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1001;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 20px 30px;
+      border: 1px solid #333333;
+      color: #95C11F;
+      font-size: 14px;
+      font-weight: 300;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    
+    .loading.show {
+      opacity: 1;
+    }
+    
+    .loading::after {
+      content: '';
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border: 2px solid transparent;
+      border-top: 2px solid #95C11F;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 8px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Leaflet customization */
+    .leaflet-tile {
+      filter: brightness(0.8) contrast(1.1);
+    }
+    
+    .custom-tooltip {
+      background: rgba(0, 0, 0, 0.9) !important;
+      border: 1px solid #333333 !important;
+      color: #ffffff !important;
+      font-family: 'Inter', sans-serif !important;
+      font-size: 12px !important;
+      line-height: 1.4 !important;
+      padding: 8px 12px !important;
+      backdrop-filter: blur(5px);
+    }
+    
+    .custom-tooltip::before {
+      border-top-color: #333333 !important;
+    }
+    
+    .leaflet-popup-content-wrapper {
+      background: rgba(0, 0, 0, 0.95) !important;
+      color: #ffffff !important;
+      border: 1px solid #333333 !important;
+      backdrop-filter: blur(10px);
+    }
+    
+    .leaflet-popup-tip {
+      background: rgba(0, 0, 0, 0.95) !important;
+      border: 1px solid #333333 !important;
+    }
+    
+    /* Smooth scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .title, .subtitle, .description {
+      animation: fadeInUp 1s ease-out forwards;
+    }
+    
+    .subtitle { animation-delay: 0.2s; }
+    .description { animation-delay: 0.4s; }
+    .scroll-indicator { animation-delay: 0.8s; }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .header, .main-content, .map-header {
+        padding-left: 40px;
+        padding-right: 40px;
+      }
+      
+      .map-controls, .info-panel {
+        right: 15px;
+        left: 15px;
+        max-width: none;
+        min-width: auto;
+      }
+      
+      .scroll-indicator {
+        left: 40px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+      }
+      
+      .header-info {
+        text-align: left;
+      }
+      
+      .map-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 16px 24px;
+      }
+      
+      .control-panel {
+        padding: 12px;
+        min-width: auto;
+      }
+      
+      .scroll-indicator {
+        left: 24px;
+      }
+      
+      .header, .main-content, .map-header {
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <canvas id="sunraysCanvas"></canvas>
-        <div class="hero-content">
-            <h1 class="hero-title">SlimShady</h1>
-            <p class="hero-subtitle">
-                Mapping urban shade availability across Amsterdam's infrastructure. 
-                Understanding how trees, buildings, and urban design create cooler, more comfortable pedestrian spaces.
-            </p>
-            <div class="hero-nav">
-                <a href="#map-section" class="hero-link">Explore Map</a>
-            </div>
+  <!-- Hero Section with Animation -->
+  <section class="hero-section" id="hero">
+    <canvas id="sunRaysCanvas"></canvas>
+    
+    <div class="hero-content">
+      <header class="header">
+        <div class="logo">Throwing Shade</div>
+        <div class="header-info">
+          MIT Senseable City Lab<br>
+          TUD 3D Geoinformation
         </div>
-        <div class="scroll-indicator" onclick="scrollToMap()"></div>
-    </section>
+      </header>
+      
+      <main class="main-content">
+        <h1 class="title">(Slim) Shady</h1>
+        <p class="subtitle">
+          Making shade visible<br>
+          and actionable
+        </p>
+        <p class="description">
+            This project reveals where Amsterdam’s sidewalks<br>
+            stay shady, and where they don’t. By combining high-res<br>
+            shade simulations, tree canopy data, and building models,<br>
+            we create a living map of shade availability.<br>
+            <br>
+            The purpose? To help planners, designers, and communities<br>
+            make strategic decisions on planting, design, and climate<br>
+            adaptation — starting right here, right now.
+          </p>
+      </main>
+      
+      <div class="scroll-indicator" onclick="scrollToMap()">
+        <div class="scroll-arrow"></div>
+        <span>Explore Data</span>
+      </div>
+    </div>
+  </section>
 
-    <!-- Map Section -->
-    <section id="map-section" class="map-section">
-        <div class="map-header">
-            <div class="map-title">SlimShady - Interactive Shade Analysis</div>
-            <a href="#" class="back-to-top" onclick="scrollToTop()">↑ Back to Top</a>
+  <!-- Map Section -->
+  <section class="map-section" id="map-section">
+    <div class="map-header">
+      <div class="map-title">
+        <span>(Slim) Shady</span>
+        <span style="color: #666666;">|</span>
+        <span style="color: #95C11F; font-weight: 300;">Interactive Shade Analysis of Amsterdam</span>
+      </div>
+      <a href="#hero" class="back-to-top">↑ Back to Top</a>
+    </div>
+    
+    <div class="map-container">
+      <div id="map"></div>
+      
+      <!-- Map Controls -->
+      <div class="map-controls">
+        <div class="control-panel">
+          <div class="control-title">Shade Index Legend</div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #B71C1C;"></div>
+            <span>No shade (0.0)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #FF5722;"></div>
+            <span>Low shade (0.2)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #FF9800;"></div>
+            <span>Moderate shade (0.4)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #FFC107;"></div>
+            <span>Good shade (0.6)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #95C11F;"></div>
+            <span>High shade (0.8)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #5B7026;"></div>
+            <span>Full shade (1.0)</span>
+          </div>
         </div>
+      </div>
+      
+      <!-- Info Panel -->
+      <div class="info-panel" id="infoPanel">
+        <button class="info-close" onclick="hideInfoPanel()">×</button>
+        <div class="info-title">Neighborhood Details</div>
+        <div class="info-stats" id="buurtInfo">
+          Click on a neighborhood to view detailed shade analysis...
+        </div>
+      </div>
+      
+      <!-- Loading Indicator -->
+      <div class="loading" id="loadingIndicator">
+        Loading data
+      </div>
+    </div>
+  </section>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="sunrays.js"></script>
+  <script src="map.js"></script>
+  
+  <script>
+    // Smooth scroll to map section
+    function scrollToMap() {
+      document.getElementById('map-section').scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+    
+    // Handle canvas resizing when scrolling
+    let isHeroVisible = true;
+    
+    function handleScroll() {
+      const heroSection = document.getElementById('hero');
+      const heroRect = heroSection.getBoundingClientRect();
+      const isCurrentlyVisible = heroRect.bottom > 0 && heroRect.top < window.innerHeight;
+      
+      if (isCurrentlyVisible !== isHeroVisible) {
+        isHeroVisible = isCurrentlyVisible;
         
-        <div id="map"></div>
-
-        <!-- Legend -->
-        <div class="legend">
-            <div class="legend-title">Shade Quality</div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #5B7026;"></div>
-                <span>Excellent (0.9-1.0)</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #95C11F;"></div>
-                <span>Very Good (0.7-0.9)</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #FF9800;"></div>
-                <span>Acceptable (0.5-0.7)</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #B71C1C;"></div>
-                <span>Poor Shading (0-0.5)</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #333333;"></div>
-                <span>No Data</span>
-            </div>
-        </div>
-
-        <!-- Info Panel -->
-        <div id="infoPanel">
-            <button class="close-info" onclick="hideInfoPanel()">×</button>
-            <div class="info-title" id="infoTitle">Neighborhood</div>
-            <div class="info-content" id="infoContent">
-                Click on a neighborhood to view detailed shade analysis...
-            </div>
-        </div>
-
-        <!-- Loading Indicator -->
-        <div id="loadingIndicator">
-            <div>Loading shade data...</div>
-        </div>
-    </section>
-
-    <!-- Scripts -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="sunrays.js"></script>
-    <script src="map.js"></script>
-
-    <script>
-        function scrollToMap() {
-            document.getElementById('map-section').scrollIntoView({
-                behavior: 'smooth'
-            });
+        // Resize canvas when hero visibility changes
+        if (window.resizeCanvas) {
+          window.resizeCanvas();
         }
-
-        function scrollToTop() {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
+      }
+    }
+    
+    // Optimize scroll listening
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+      scrollTimeout = setTimeout(handleScroll, 100);
+    });
+    
+    // Initialize map when map section becomes visible
+    let mapInitialized = false;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !mapInitialized) {
+          mapInitialized = true;
+          // Initialize map here - the map.js will handle this
         }
-    </script>
+      });
+    }, { threshold: 0.1 });
+    
+    observer.observe(document.getElementById('map-section'));
+  </script>
 </body>
 </html>
