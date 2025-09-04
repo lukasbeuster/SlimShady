@@ -72,9 +72,12 @@ function hideLoading() {
 
 // Info panel functions
 function showInfoPanel(title, content) {
-  document.getElementById('infoTitle').textContent = title;
-  document.getElementById('infoContent').innerHTML = content;
+  const titleElement = document.querySelector('#infoPanel .info-title');
+  const contentElement = document.getElementById('buurtInfo');
+  if (titleElement) titleElement.textContent = title;
+  if (contentElement) contentElement.innerHTML = content;
   document.getElementById('infoPanel').classList.add('active');
+}
 }
 
 function hideInfoPanel() {

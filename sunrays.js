@@ -1,5 +1,12 @@
-const canvas = document.getElementById('sunRaysCanvas');
-const ctx = canvas.getContext('2d');
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+  const canvas = document.getElementById('sunRaysCanvas');
+  if (!canvas) {
+    console.warn('sunRaysCanvas not found');
+    return;
+  }
+  
+  const ctx = canvas.getContext('2d');
 
 // Resize canvas to full screen
 function resizeCanvas() {
@@ -561,3 +568,4 @@ animate();
 setTimeout(() => {
   createRipple();
 }, 1500);
+});
