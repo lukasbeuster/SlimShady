@@ -85,7 +85,6 @@ function showInfoPanel(title, content) {
   if (contentElement) contentElement.innerHTML = content;
   document.getElementById('infoPanel').classList.add('active');
 }
-}
 
 function hideInfoPanel() {
   document.getElementById('infoPanel').classList.remove('active');
