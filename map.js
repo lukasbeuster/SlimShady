@@ -50,7 +50,8 @@ function initializeMap() {
   map = L.map('map', {
     zoomControl: false,
     minZoom: 10,
-    maxZoom: 18
+    maxZoom: 19,
+    scrollWheelZoom: false // disable to allow page scroll past the map
   }).setView([52.3676, 4.9041], 11);
 
   // Add zoom control in bottom right
@@ -67,6 +68,9 @@ function initializeMap() {
   
   mapInitialized = true;
   loadMapData();
+
+  // Friendly scroll/zoom behavior: page scroll by default, Ctrl+wheel to zoom
+  setupWheelZoomHint();
 }
 
 // Loading functions
@@ -199,8 +203,35 @@ async function loadMapData() {
   } catch (error) {
     console.error('Error loading map data:', error);
   } finally {
-    hideLoading();
-  }
+  hideLoading();
+}
+
+// Enable wheel zoom only with Ctrl/⌘ and show a hint
+function setupWheelZoomHint() {
+  const container = map.getContainer();
+  const hint = document.getElementById('zoomHint');
+  let disableTimer = null;
+  
+  function showHint() { if (hint) hint.classList.add('show'); }
+  function hideHint() { if (hint) hint.classList.remove('show'); }
+
+  container.addEventListener('mouseenter', () => { showHint(); });
+  container.addEventListener('mouseleave', () => { hideHint(); map.scrollWheelZoom.disable(); });
+
+  container.addEventListener('wheel', (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      // use wheel to zoom map and not scroll page
+      e.preventDefault();
+      hideHint();
+      if (!map.scrollWheelZoom.enabled()) map.scrollWheelZoom.enable();
+      if (disableTimer) clearTimeout(disableTimer);
+      disableTimer = setTimeout(() => map.scrollWheelZoom.disable(), 800);
+    } else {
+      showHint();
+      // leave scrollWheelZoom disabled so the page can scroll
+    }
+  }, { passive: false });
+}
 }
 
 // Load detailed neighborhood data with filtering
