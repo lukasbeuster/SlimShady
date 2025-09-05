@@ -184,8 +184,8 @@
 
     .about-layout {
       display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 24px;
+      grid-template-columns: 1fr;
+      gap: 20px;
       align-items: start;
       margin-top: 20px;
     }
@@ -231,14 +231,15 @@
 
     .about-visuals {
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 16px;
     }
 
-    .about-right {
-      border-left: 1px solid #1f1f1f;
-      padding-left: 16px;
-    }
+    .about-right { padding-left: 0; border-left: 0; }
+
+    .howto { padding: 0; margin-bottom: 6px; }
+    .howto h3 { font-size: 16px; font-weight: 500; color: #e6e6e6; margin-bottom: 8px; }
+    .howto ul { margin-left: 18px; color: #b0b0b0; font-size: 14px; line-height: 1.7; }
 
     .preview {
       position: relative;
@@ -272,6 +273,18 @@
       font-size: 12px;
       padding: 8px 10px 10px;
       border-top: 1px solid #252525;
+    }
+
+    .palette-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .option-label {
+      color: #cfcfcf;
+      font-size: 13px;
+      letter-spacing: 0.02em;
+      margin-bottom: 8px;
     }
 
     .about-footer {
@@ -591,7 +604,9 @@
       }
       .about-section { padding: 40px 24px; }
       .about-layout { grid-template-columns: 1fr; gap: 16px; }
+      .about-visuals { grid-template-columns: 1fr; }
       .about-right { border-left: 0; padding-left: 0; }
+      .palette-comparison { grid-template-columns: 1fr; gap: 18px; }
       
       .map-header {
         flex-direction: column;
@@ -684,29 +699,29 @@
     </p>
 
     <div class="about-layout">
-      <div class="about-card">
+      <div class="howto">
         <h3>How to use the map</h3>
         <ul>
           <li>Start with the overview to compare neighborhoods.</li>
           <li>Click a neighborhood to zoom to sidewalk detail.</li>
-          <li>Color scale: red = limited shade, yellow/green = better shade.</li>
+          <li>Color scale: amber → teal → SCL green → dark green.</li>
           <li>Read the summary to see % of sidewalks by shade level.</li>
         </ul>
       </div>
 
       <div class="about-right">
-      <div class="about-visuals">
-        <div class="preview" aria-label="Overview map preview">
-          <span class="preview-badge">Overview</span>
-          <img src="data/overview_preview.svg" alt="Overview map preview">
-          <div class="preview-caption">Amsterdam neighborhoods colored by average sidewalk shade (SAI).</div>
+        <div class="about-visuals">
+          <div class="preview" aria-label="Overview map preview">
+            <span class="preview-badge">Overview</span>
+            <img src="data/overview_preview.svg" alt="Overview map preview">
+            <div class="preview-caption">Amsterdam neighborhoods colored by average sidewalk shade (SAI).</div>
+          </div>
+          <div class="preview" aria-label="Neighborhood detail preview">
+            <span class="preview-badge">Neighborhood</span>
+            <img src="data/neighborhood_preview.svg" alt="Neighborhood detail preview">
+            <div class="preview-caption">Example neighborhood segments colored by shade level.</div>
+          </div>
         </div>
-        <div class="preview" aria-label="Neighborhood detail preview">
-          <span class="preview-badge">Neighborhood</span>
-          <img src="data/neighborhood_preview.svg" alt="Neighborhood detail preview">
-          <div class="preview-caption">Example neighborhood segments colored by shade level.</div>
-        </div>
-      </div>
       </div>
     </div>
 
@@ -750,11 +765,11 @@
         <div class="control-panel">
           <div class="control-title">Shade Availability Index</div>
           <div class="legend-item">
-            <div class="legend-color" style="background: #B71C1C;"></div>
+            <div class="legend-color" style="background: #D9A441;"></div>
             <span>Poor Shading (<0.5)</span>
           </div>
           <div class="legend-item">
-            <div class="legend-color" style="background: #FF9800;"></div>
+            <div class="legend-color" style="background: #4FA3B6;"></div>
             <span>Acceptable (<0.7)</span>
           </div>
           <div class="legend-item">

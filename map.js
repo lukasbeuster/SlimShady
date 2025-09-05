@@ -1,7 +1,9 @@
-// SCL Color scheme for shade visualization
+// SCL Color scheme (colorblind-friendly adaptation)
 const SCL_COLORS = {
-  green: '#95C11F',
-  darkGreen: '#5B7026',
+  gray: '#D9A441',      // Poor (amber)
+  teal: '#4FA3B6',      // Acceptable (teal)
+  green: '#95C11F',     // Very Good (SCL Green)
+  darkGreen: '#5B7026', // Excellent (SCL Dark Green)
   text: '#ffffff',
   background: '#000000'
 };
@@ -9,11 +11,10 @@ const SCL_COLORS = {
 // Shade categories with professional color mapping
 function getShadeColor(shadeIndex) {
   if (shadeIndex === undefined || shadeIndex === null) return '#666666';
-  
-  if (shadeIndex < 0.5) return '#B71C1C';        // Deep red - Poor Shading
-  if (shadeIndex < 0.7) return '#FF9800';        // Orange - Acceptable  
-  if (shadeIndex < 0.9) return SCL_COLORS.green; // SCL Green - Very Good
-  return SCL_COLORS.darkGreen;                   // SCL Dark Green - Excellent
+  if (shadeIndex < 0.5) return SCL_COLORS.gray;      // Poor (neutral gray)
+  if (shadeIndex < 0.7) return SCL_COLORS.teal;      // Acceptable (teal-blue)
+  if (shadeIndex < 0.9) return SCL_COLORS.green;     // Very Good (SCL green)
+  return SCL_COLORS.darkGreen;                        // Excellent (dark green)
 }
 
 // Get shade category label
@@ -139,10 +140,14 @@ async function loadMapData() {
         const segmentCount = props.shade_availability_index_30_count || 0;
         const coverage = props.coverage_excellent || 0;
         const category = getShadeCategory(meanShade);
+        const color = getShadeColor(meanShade);
         
         layer.bindTooltip(`
           <strong>${buurtName}</strong><br>
-          Shade Quality: ${category}<br>
+          <span style="display:inline-flex;align-items:center;gap:6px;">
+            <span style="display:inline-block;width:10px;height:10px;background:${color};border:1px solid #555;"></span>
+            <span>Shade Quality: ${category}</span>
+          </span><br>
           Average Index: ${meanShade.toFixed(2)}<br>
           ${segmentCount} sidewalk segments
         `, { 
@@ -227,7 +232,7 @@ function showNeighborhoodOverview(buurtName, meanShade, segmentCount, coverage) 
     <div style="margin-bottom: 16px;">
       <div class="info-stat">
         <span class="info-stat-label">Shade Quality:</span>
-        <span class="info-stat-value">${category}</span>
+        <span class="info-stat-value"><span style="display:inline-block;width:10px;height:10px;background:${color};border:1px solid #555;margin-right:6px;"></span>${category}</span>
       </div>
       <div class="info-stat">
         <span class="info-stat-label">Average Index:</span>
@@ -280,10 +285,14 @@ function displayNeighborhoodDetails(buurtData, buurtName, meanShade, segmentCoun
       const shadeIndex = feature.properties.shade_availability_index_30;
       const guid = feature.properties.Guid;
       const category = getShadeCategory(shadeIndex);
+      const chip = getShadeColor(shadeIndex);
       
       layer.bindTooltip(`
         <strong>Sidewalk Segment</strong><br>
-        Shade Category: ${category}<br>
+        <span style="display:inline-flex;align-items:center;gap:6px;">
+          <span style="display:inline-block;width:10px;height:10px;background:${chip};border:1px solid #555;"></span>
+          <span>Shade Category: ${category}</span>
+        </span><br>
         Index: ${shadeIndex?.toFixed(2) || 'N/A'}<br>
         ID: ${guid || 'N/A'}
       `, { 
@@ -337,11 +346,11 @@ function displayNeighborhoodDetails(buurtData, buurtName, meanShade, segmentCoun
     <div style="margin-bottom: 16px;">
       <div style="font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 8px;">Distribution</div>
       <div class="info-stat">
-        <span style="color: #B71C1C;">Poor:</span>
+        <span style="color: #D9A441;">Poor:</span>
         <span>${poorCount}</span>
       </div>
       <div class="info-stat">
-        <span style="color: #FF9800;">Acceptable:</span>
+        <span style="color: #4FA3B6;">Acceptable:</span>
         <span>${acceptableCount}</span>
       </div>
       <div class="info-stat">
