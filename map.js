@@ -157,6 +157,7 @@ async function loadMapData() {
         });
 
         layer.on('mouseover', (e) => {
+          if (isDetailView) return; // no highlight while in detail view
           layer.setStyle({ 
             fillOpacity: 0.8,
             weight: 2
@@ -164,7 +165,10 @@ async function loadMapData() {
         });
         
         layer.on('mouseout', (e) => {
-          if (!isDetailView) {
+          if (isDetailView) {
+            // ensure faint style persists during detail view
+            e.target.setStyle({ fillOpacity: 0.1, opacity: 0.3, weight: 1 });
+          } else {
             buurtenLayer.resetStyle(e.target);
           }
         });
@@ -258,9 +262,9 @@ function displayNeighborhoodDetails(buurtData, buurtName, meanShade, segmentCoun
   // Switch to detail view
   isDetailView = true;
   
-  // Hide neighborhood layer
+  // Fade neighborhood layer and remove any lingering hover weights
   if (buurtenLayer) {
-    buurtenLayer.setStyle({ fillOpacity: 0.1, opacity: 0.3 });
+    buurtenLayer.eachLayer(l => l.setStyle({ fillOpacity: 0.1, opacity: 0.3, weight: 1 }));
   }
   
   // Remove previous detail layer
@@ -302,6 +306,7 @@ function displayNeighborhoodDetails(buurtData, buurtName, meanShade, segmentCoun
       });
     }
   }).addTo(map);
+  currentBuurtLayer.bringToFront();
   
   // Zoom to neighborhood
   map.fitBounds(buurtLayer.getBounds(), { padding: [50, 50] });
