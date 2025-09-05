@@ -41,6 +41,9 @@ let parallaxX = 0, parallaxY = 0, parallaxTargetX = 0, parallaxTargetY = 0;
 // Foreground promenades and animated pedestrians
 let promenades = [];
 let pedestrians = [];
+let furniture = []; // benches, lamps, etc.
+let cyclePaths = [];
+let cyclists = [];
 let exposureNow = 0;      // fraction shaded [0..1]
 let exposureDisplay = 0;  // eased display value
 let ripples = [];
@@ -152,6 +155,28 @@ function initializePositions() {
     { x1: canvas.width * 0.08, y1: yBase, x2: canvas.width * 0.92, y2: yBase, width: 18 },
     { x1: canvas.width * 0.15, y1: yBase + 36, x2: canvas.width * 0.85, y2: yBase + 36, width: 14 }
   ];
+  // Place simple benches and lamps along promenades
+  furniture = [];
+  for (const pr of promenades) {
+    const dx = pr.x2 - pr.x1, dy = pr.y2 - pr.y1;
+    const L = Math.hypot(dx, dy) || 1;
+    const ux = dx / L, uy = dy / L; // along-path unit (store for furniture)
+    const px = -uy, py = ux;        // perpendicular unit
+    const count = 4;
+    for (let i = 1; i <= count; i++) {
+      const t = i / (count + 1);
+      const bx = pr.x1 + ux * L * t + px * (pr.width * 1.2);
+      const by = pr.y1 + uy * L * t + py * (pr.width * 1.2);
+      furniture.push({ type: 'bench', x: bx, y: by, w: 24, h: 6, ax: ux, ay: uy, px, py });
+    }
+    const lamps = 3;
+    for (let j = 1; j <= lamps; j++) {
+      const t = j / (lamps + 1);
+      const lx = pr.x1 + ux * L * t - px * (pr.width * 1.8);
+      const ly = pr.y1 + uy * L * t - py * (pr.width * 1.8);
+      furniture.push({ type: 'lamp', x: lx, y: ly, h: 26, px, py });
+    }
+  }
   // Seed pedestrians
   const seedCount = 10;
   pedestrians = [];
@@ -163,6 +188,31 @@ function initializePositions() {
       speed: 0.02 + Math.random() * 0.03,
       radius: 4 + Math.random() * 2
     });
+  }
+
+  // Bike lane midway between promenades (or offset from first if single)
+  cyclePaths = [];
+  if (promenades.length >= 2) {
+    const a = promenades[0], b = promenades[1];
+    cyclePaths.push({
+      x1: (a.x1 + b.x1) / 2,
+      y1: (a.y1 + b.y1) / 2,
+      x2: (a.x2 + b.x2) / 2,
+      y2: (a.y2 + b.y2) / 2,
+      width: 10
+    });
+  } else if (promenades.length === 1) {
+    const p = promenades[0];
+    const dx = p.x2 - p.x1, dy = p.y2 - p.y1; const L = Math.hypot(dx, dy) || 1; const px = -dy/L, py = dx/L;
+    cyclePaths.push({ x1: p.x1 - px*20, y1: p.y1 - py*20, x2: p.x2 - px*20, y2: p.y2 - py*20, width: 10 });
+  }
+
+  // Seed cyclists
+  cyclists = [];
+  const cycleCount = 4;
+  for (let i = 0; i < cycleCount && cyclePaths.length; i++) {
+    const path = cyclePaths[0];
+    cyclists.push({ path, t: Math.random(), speed: 0.05 + Math.random()*0.04, wheel: 3.2 });
   }
 }
 
@@ -647,6 +697,31 @@ function drawPromenades() {
   ctx.restore();
 }
 
+function drawCycleLanes() {
+  if (!cyclePaths.length) return;
+  ctx.save();
+  for (const s of cyclePaths) {
+    // smooth lane
+    ctx.strokeStyle = 'rgba(79,163,182,0.25)'; // teal tint
+    ctx.lineWidth = s.width;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(s.x1, s.y1);
+    ctx.lineTo(s.x2, s.y2);
+    ctx.stroke();
+    // dashed center line
+    ctx.setLineDash([10, 8]);
+    ctx.strokeStyle = 'rgba(255,255,255,0.10)';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(s.x1, s.y1);
+    ctx.lineTo(s.x2, s.y2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  ctx.restore();
+}
+
 function drawPedestrians() {
   ctx.save();
   for (const p of pedestrians) {
@@ -664,14 +739,146 @@ function drawPedestrians() {
     ctx.closePath();
     ctx.fill();
 
-    // walker
-    ctx.fillStyle = col;
-    ctx.strokeStyle = '#222';
-    ctx.lineWidth = 0.6;
+    // minimal stick-figure pedestrian: head + torso + legs
+    const s = Math.max(3.5, p.radius);
+    // head
+    ctx.fillStyle = col; // color head by shade state for readability
     ctx.beginPath();
-    ctx.arc(x, y, p.radius, 0, Math.PI*2);
+    ctx.arc(x, y - s*1.2, s*0.5, 0, Math.PI*2);
     ctx.fill();
+    // torso
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(x, y - s*0.6);
+    ctx.lineTo(x, y + s*0.6);
     ctx.stroke();
+    // legs
+    ctx.lineWidth = 1.1;
+    ctx.beginPath();
+    ctx.moveTo(x, y + s*0.6);
+    ctx.lineTo(x - s*0.6, y + s*1.4);
+    ctx.moveTo(x, y + s*0.6);
+    ctx.lineTo(x + s*0.6, y + s*1.4);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawCyclists() {
+  if (!cyclePaths.length) return;
+  ctx.save();
+  for (const c of cyclists) {
+    c.t += c.speed * 0.006; if (c.t > 1) c.t -= 1;
+    const p = c.path; const dx = p.x2 - p.x1, dy = p.y2 - p.y1; const L = Math.hypot(dx, dy) || 1; const ux = dx/L, uy = dy/L; const px = -uy, py = ux;
+    const x = p.x1 + (p.x2 - p.x1) * c.t; const y = p.y1 + (p.y2 - p.y1) * c.t;
+    const shaded = isShaded(x, y);
+    const rider = shaded ? SCL_GREEN : SCL_AMBER;
+    const wb = 14; const wR = c.wheel; // wheelbase and radius
+
+    // shadow wedge
+    const sdx = x - sunX, sdy = y - sunY; const sL = Math.hypot(sdx, sdy) || 1; const sux = sdx/sL, suy = sdy/sL;
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath();
+    ctx.moveTo(x + px*3, y + py*3);
+    ctx.lineTo(x - px*3, y - py*3);
+    ctx.lineTo(x - px*3 + sux*28, y - py*3 + suy*28);
+    ctx.lineTo(x + px*3 + sux*28, y + py*3 + suy*28);
+    ctx.closePath();
+    ctx.fill();
+
+    // wheels spaced ALONG the path (ux,uy), not across
+    const wx1 = x - ux*wb/2, wy1 = y - uy*wb/2;
+    const wx2 = x + ux*wb/2, wy2 = y + uy*wb/2;
+    ctx.strokeStyle = 'rgba(220,220,220,0.7)';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.arc(wx1, wy1, wR, 0, Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(wx2, wy2, wR, 0, Math.PI*2); ctx.stroke();
+    // frame line
+    ctx.strokeStyle = 'rgba(79,163,182,0.8)';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.moveTo(wx1, wy1); ctx.lineTo(wx2, wy2); ctx.stroke();
+    // rider
+    ctx.fillStyle = rider; ctx.beginPath(); ctx.arc(x, y - 6, 3, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawCrosswalks() {
+  if (!cyclePaths.length) return;
+  ctx.save();
+  const s = cyclePaths[0];
+  const dx = s.x2 - s.x1, dy = s.y2 - s.y1; const L = Math.hypot(dx, dy) || 1; const ux = dx/L, uy = dy/L; const px = -uy, py = ux;
+  const centerT = 0.55; const cx = s.x1 + ux*L*centerT, cy = s.y1 + uy*L*centerT;
+  // Make stripes horizontal along the lane (long along ux, short across px)
+  const stripeLen = 26; // along lane length
+  const stripeThick = s.width * 0.8; // across lane thickness
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  for (let k = -3; k <= 3; k++) {
+    const tx = cx + px * (k * stripeThick * 0.6); // step across lane
+    const ty = cy + py * (k * stripeThick * 0.6);
+    // oriented rectangle centered at (tx,ty), long along path
+    ctx.beginPath();
+    ctx.moveTo(tx - ux*stripeLen/2 - px*stripeThick/2, ty - uy*stripeLen/2 - py*stripeThick/2);
+    ctx.lineTo(tx + ux*stripeLen/2 - px*stripeThick/2, ty + uy*stripeLen/2 - py*stripeThick/2);
+    ctx.lineTo(tx + ux*stripeLen/2 + px*stripeThick/2, ty + uy*stripeLen/2 + py*stripeThick/2);
+    ctx.lineTo(tx - ux*stripeLen/2 + px*stripeThick/2, ty - uy*stripeLen/2 + py*stripeThick/2);
+    ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawFurniture() {
+  ctx.save();
+  for (const f of furniture) {
+    // simple shadow wedge for furniture
+    const dx = f.x - sunX, dy = f.y - sunY; const L = Math.hypot(dx, dy) || 1; const ux = dx/L, uy = dy/L; const px = -uy, py = ux;
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath();
+    ctx.moveTo(f.x + px*4, f.y + py*2);
+    ctx.lineTo(f.x - px*4, f.y - py*2);
+    ctx.lineTo(f.x - px*4 + ux*30, f.y - py*2 + uy*30);
+    ctx.lineTo(f.x + px*4 + ux*30, f.y + py*2 + uy*30);
+    ctx.closePath();
+    ctx.fill();
+
+    if (f.type === 'bench') {
+      // bench seat oriented along path axis (ax,ay), thin across (px,py)
+      ctx.fillStyle = 'rgba(200,200,200,0.15)';
+      ctx.strokeStyle = 'rgba(255,255,255,0.10)';
+      ctx.lineWidth = 1;
+      const w = f.w, h = f.h;
+      const ax = f.ax || 1, ay = f.ay || 0; // fallback if missing
+      const px = f.px, py = f.py;
+      // corners: +/- ax*w/2 +/- px*h/2
+      ctx.beginPath();
+      ctx.moveTo(f.x - ax*w/2 - px*h/2, f.y - ay*w/2 - py*h/2);
+      ctx.lineTo(f.x + ax*w/2 - px*h/2, f.y + ay*w/2 - py*h/2);
+      ctx.lineTo(f.x + ax*w/2 + px*h/2, f.y + ay*w/2 + py*h/2);
+      ctx.lineTo(f.x - ax*w/2 + px*h/2, f.y - ay*w/2 + py*h/2);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      // backrest hint along width near one side
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.beginPath();
+      ctx.moveTo(f.x - ax*w/2 + px*4, f.y - ay*w/2 + py*4);
+      ctx.lineTo(f.x + ax*w/2 + px*4, f.y + ay*w/2 + py*4);
+      ctx.stroke();
+    } else if (f.type === 'lamp') {
+      // pole
+      ctx.strokeStyle = 'rgba(220,220,220,0.6)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(f.x, f.y);
+      ctx.lineTo(f.x, f.y - f.h);
+      ctx.stroke();
+      // lamp head
+      ctx.fillStyle = 'rgba(255,255,255,0.12)';
+      ctx.beginPath();
+      ctx.arc(f.x, f.y - f.h, 4, 0, Math.PI*2);
+      ctx.fill();
+    }
   }
   ctx.restore();
 }
@@ -853,6 +1060,9 @@ function animate() {
   drawShadows();
   // Foreground promenades receive rays/shadows too
   drawPromenades();
+  drawCycleLanes();
+  drawCrosswalks();
+  drawFurniture();
   
   // Update and draw rays
   for (const ray of rays) {
@@ -870,6 +1080,7 @@ function animate() {
   // Pedestrians at the very end for crispness
   updatePedestrians();
   drawPedestrians();
+  drawCyclists();
   drawExposureMeter();
 
   time += 0.02; // Slower, more professional animation
