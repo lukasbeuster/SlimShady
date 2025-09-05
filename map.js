@@ -157,7 +157,18 @@ async function loadMapData() {
         });
 
         layer.on('mouseover', (e) => {
-          if (isDetailView) return; // no highlight while in detail view
+          if (isDetailView) {
+            // In detail view: outline-only highlight to aid selection
+            e.target.setStyle({
+              fillOpacity: 0,
+              weight: 3,
+              color: '#bbbbbb',
+              opacity: 1
+            });
+            e.target.bringToFront();
+            return;
+          }
+          // Overview: subtle fill highlight
           layer.setStyle({ 
             fillOpacity: 0.8,
             weight: 2
@@ -166,11 +177,11 @@ async function loadMapData() {
         
         layer.on('mouseout', (e) => {
           if (isDetailView) {
-            // ensure faint style persists during detail view
-            e.target.setStyle({ fillOpacity: 0.1, opacity: 0.3, weight: 1 });
-          } else {
-            buurtenLayer.resetStyle(e.target);
+            // ensure faint style persists during detail view (no fill highlight)
+            e.target.setStyle({ fillOpacity: 0.1, opacity: 0.3, weight: 1, color: '#333' });
+            return;
           }
+          buurtenLayer.resetStyle(e.target);
         });
         
         layer.on('click', (e) => {
