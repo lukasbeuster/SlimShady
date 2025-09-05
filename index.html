@@ -6,7 +6,7 @@
   <title>Throwing Shade | Urban Shade Analysis</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@700&display=swap');
     
     * {
       margin: 0;
@@ -15,7 +15,7 @@
     }
     
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: #000000;
       color: #ffffff;
       line-height: 1.6;
@@ -82,11 +82,42 @@
       max-width: 1200px;
       width: 100%;
       margin: 0 auto;
+      position: relative;
+      z-index: 2;
     }
+
+    /* Minimal text box + per-letter halo */
+    .text-panel {
+      position: relative;
+      background: linear-gradient(180deg, rgba(0,0,0,0.72), rgba(0,0,0,0.66));
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.03);
+      backdrop-filter: blur(6px) saturate(110%);
+      -webkit-backdrop-filter: blur(6px) saturate(110%);
+      border-radius: 6px;
+      padding: 28px 32px;
+      max-width: clamp(360px, 46vw, 640px);
+    }
+    .text-panel::before {
+      content: '';
+      position: absolute;
+      left: -1px;
+      top: 10px;
+      bottom: 10px;
+      width: 3px;
+      background: linear-gradient(180deg, #D9A441 0%, #95C11F 100%);
+      box-shadow: 0 0 12px rgba(217, 164, 65, 0.25);
+      opacity: 0.9;
+    }
+    .title, .subtitle, .description {
+      text-shadow: 0 1px 1px rgba(0,0,0,0.6), 0 0 6px rgba(0,0,0,0.2);
+    }
+    .subtitle { letter-spacing: 0.02em; }
     
     .title {
       font-size: clamp(48px, 6vw, 84px);
-      font-weight: 300;
+      font-family: 'Roboto', sans-serif;
+      font-weight: 500; /* Roboto Medium */
       color: #ffffff;
       letter-spacing: -0.03em;
       line-height: 0.95;
@@ -95,7 +126,8 @@
     
     .subtitle {
       font-size: 20px;
-      font-weight: 400;
+      font-family: 'Roboto Mono', monospace; /* Key words style */
+      font-weight: 700; /* Roboto Mono Bold */
       color: #95C11F;
       margin-bottom: 32px;
       max-width: 600px;
@@ -103,7 +135,7 @@
     
     .description {
       font-size: 16px;
-      font-weight: 300;
+      font-weight: 400; /* Roboto Regular */
       color: #cccccc;
       max-width: 500px;
       line-height: 1.7;
@@ -577,6 +609,7 @@
         padding-left: 40px;
         padding-right: 40px;
       }
+      .text-panel { padding: 24px 28px; max-width: 600px; }
       .about-section { padding: 56px 40px; }
       .about-layout { grid-template-columns: 1fr; gap: 18px; }
       
@@ -628,6 +661,7 @@
         padding-left: 24px;
         padding-right: 24px;
       }
+      .text-panel { padding: 20px; max-width: 92vw; }
     }
   </style>
 </head>
@@ -647,21 +681,23 @@
       </header>
       
       <main class="main-content">
-        <h1 class="title">(Slim) Shady</h1>
-        <p class="subtitle">
-          Making shade patterns visible<br>
-          and actionable
-        </p>
-        <p class="description">
-            When the city heats up, shade is the simplest relief.<br>
-            It keeps our streets walkable, our plagrounds safe,<br>
-            and offers comfort to the elderly and vulnerable among us. <br> 
-            <br>
-            This project maps where that shade exists, and where it's missing<br>
-           <em>(Slim) Shady</em>: a smart take (<em>slim</em> means smart in Dutch) 
-           on narrow sidewalks, hot streets, and overcomplicated climate plans.<br>
-           Shade, served with scientific rigour, and just a enough of an attitude to get things moving.
+        <div class="text-panel">
+          <h1 class="title">(Slim) Shady</h1>
+          <p class="subtitle">
+            Making shade patterns visible<br>
+            and actionable
           </p>
+          <p class="description">
+              When the city heats up, shade is the simplest relief.<br>
+              It keeps our streets walkable, our playgrounds safe,<br>
+              and offers comfort to the elderly and vulnerable among us. <br> 
+              <br>
+              This project maps where that shade exists, and where it's missing<br>
+             <em>(Slim) Shady</em>: a smart take (<em>slim</em> means smart in Dutch) 
+             on narrow sidewalks, hot streets, and overcomplicated climate plans.<br>
+             Shade, served with scientific rigour, and just a enough of an attitude to get things moving.
+            </p>
+        </div>
       </main>
       
       <div class="scroll-indicator" onclick="scrollToAbout()">
@@ -706,7 +742,7 @@
         <ul>
           <li>Start with the overview to compare neighborhoods.</li>
           <li>Click a neighborhood to zoom to sidewalk detail.</li>
-          <li>Color scale: amber → teal → SCL green → dark green.</li>
+          <li>Color scale: amber → teal → light green → dark green.</li>
           <li>Read the summary to see % of sidewalks by shade level.</li>
         </ul>
       </div>
@@ -740,7 +776,7 @@
     </p>
 
     <div class="about-footer">
-      <div class="about-note">Built for action — not just analysis.</div>
+      <div class="about-note">Built for action, not just analysis.</div>
       <div class="about-cta">
         <a class="about-button" href="#map-section">Continue to Map</a>
       </div>
@@ -806,6 +842,7 @@
   <script src="map.js"></script>
   
   <script>
+    // (panel style locked to Bar)
     // Smooth scroll to about section
     function scrollToAbout() {
       document.getElementById('about-section').scrollIntoView({ 
