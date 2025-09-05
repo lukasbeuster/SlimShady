@@ -19,6 +19,8 @@ resizeCanvas();
 // SCL Colors for dark mode
 const SCL_GREEN = '#95C11F';
 const SCL_DARK_GREEN = '#5B7026';
+const DESAT_GREEN = '#8FAE3A';
+const DESAT_DARK = '#4C5F1D';
 const SCL_AMBER = '#D9A441'; // warm amber for sun accents
 const BACKGROUND = '#1a1a1a';
 
@@ -31,6 +33,7 @@ const MAX_CONCURRENT_RIPPLES = 5; // allow more simultaneous pulses
 let time = 0;
 let sunX, sunY;
 let obstacles = [];
+let parallaxX = 0, parallaxY = 0, parallaxTargetX = 0, parallaxTargetY = 0;
 let ripples = [];
 let horizonY;
 
@@ -49,7 +52,8 @@ function initializePositions() {
       y: horizonY - canvas.height * 0.4, 
       width: 60, 
       height: canvas.height * 0.4,
-      windows: true
+      windows: true,
+      pf: 0.02
     },
     { 
       type: 'building',
@@ -57,7 +61,8 @@ function initializePositions() {
       y: horizonY - canvas.height * 0.35, 
       width: 45, 
       height: canvas.height * 0.35,
-      windows: true
+      windows: true,
+      pf: 0.02
     },
     { 
       type: 'building',
@@ -65,7 +70,8 @@ function initializePositions() {
       y: horizonY - canvas.height * 0.45, 
       width: 50, 
       height: canvas.height * 0.45,
-      windows: true
+      windows: true,
+      pf: 0.02
     },
     
     // Medium buildings (center)
@@ -75,7 +81,8 @@ function initializePositions() {
       y: horizonY - canvas.height * 0.25, 
       width: 40, 
       height: canvas.height * 0.25,
-      windows: true
+      windows: true,
+      pf: 0.018
     },
     { 
       type: 'building',
@@ -83,23 +90,25 @@ function initializePositions() {
       y: horizonY - canvas.height * 0.3, 
       width: 35, 
       height: canvas.height * 0.3,
-      windows: true
+      windows: true,
+      pf: 0.018
     },
     
     // Trees interspersed along horizon
-    { type: 'tree', x: canvas.width * 0.34, y: horizonY - 18, radius: 38 },
-    { type: 'tree', x: canvas.width * 0.50, y: horizonY - 14, radius: 32 },
-    { type: 'tree', x: canvas.width * 0.61, y: horizonY - 22, radius: 44 },
+    { type: 'tree', x: canvas.width * 0.34, y: horizonY - 18, radius: 38, pf: 0.03 },
+    { type: 'tree', x: canvas.width * 0.50, y: horizonY - 14, radius: 32, pf: 0.03 },
+    { type: 'tree', x: canvas.width * 0.61, y: horizonY - 22, radius: 44, pf: 0.03 },
     
     // More distant buildings (right side)
-    { type: 'building', x: canvas.width * 0.7,  y: horizonY - canvas.height * 0.22, width: 34, height: canvas.height * 0.22, windows: false },
+    { type: 'building', x: canvas.width * 0.7,  y: horizonY - canvas.height * 0.22, width: 34, height: canvas.height * 0.22, windows: false, pf: 0.016 },
     { 
       type: 'building',
       x: canvas.width * 0.75, 
       y: horizonY - canvas.height * 0.15, 
       width: 35, 
       height: canvas.height * 0.15,
-      windows: false
+       windows: false,
+       pf: 0.016
     },
     { 
       type: 'building',
@@ -107,9 +116,13 @@ function initializePositions() {
       y: horizonY - canvas.height * 0.18, 
       width: 25, 
       height: canvas.height * 0.18,
-      windows: false
+      windows: false,
+      pf: 0.016
     }
   ];
+
+  // Save base positions for parallax
+  for (const o of obstacles) { o.baseX = o.x; o.baseY = o.y; }
 }
 
 initializePositions();
@@ -463,8 +476,8 @@ function drawHorizonCityscape() {
     } else if (obstacle.type === 'tree') {
       // Refined tree design
       const treeGradient = ctx.createRadialGradient(obstacle.x, obstacle.y, 0, obstacle.x, obstacle.y, obstacle.radius);
-      treeGradient.addColorStop(0, SCL_GREEN);
-      treeGradient.addColorStop(0.6, SCL_DARK_GREEN);
+      treeGradient.addColorStop(0, DESAT_GREEN);
+      treeGradient.addColorStop(0.6, DESAT_DARK);
       treeGradient.addColorStop(1, '#0f1607');
       
       ctx.fillStyle = treeGradient;
@@ -509,35 +522,39 @@ function drawShadows() {
   ctx.save();
   ctx.globalCompositeOperation = 'multiply';
   for (const obstacle of obstacles) {
-    let cx, cy, extent, base;
+    let near1x, near1y, near2x, near2y, far1x, far1y, far2x, far2y, extent;
     if (obstacle.type === 'building') {
-      cx = obstacle.x + obstacle.width / 2;
-      cy = obstacle.y + obstacle.height / 2;
-      base = Math.max(12, obstacle.width * 0.8);
+      const left = obstacle.x;
+      const right = obstacle.x + obstacle.width;
+      const top = obstacle.y;
+      const bottom = obstacle.y + obstacle.height;
+      // choose edge opposite the sun horizontally
+      const edgeX = (sunX > (left + right) / 2) ? left : right;
+      near1x = edgeX; near1y = top;
+      near2x = edgeX; near2y = bottom;
+      const midx = edgeX; const midy = (top + bottom) / 2;
+      const dx = midx - sunX, dy = midy - sunY;
+      const len = Math.hypot(dx, dy) || 1;
+      const ux = dx / len, uy = dy / len;
       extent = Math.max(canvas.width, canvas.height) * 0.9;
+      far1x = near1x + ux * extent; far1y = near1y + uy * extent;
+      far2x = near2x + ux * extent; far2y = near2y + uy * extent;
     } else if (obstacle.type === 'tree') {
-      cx = obstacle.x; cy = obstacle.y; base = obstacle.radius * 1.6; extent = obstacle.radius * 12;
+      const cx = obstacle.x, cy = obstacle.y;
+      const base = obstacle.radius * 1.8;
+      const extentTree = obstacle.radius * 14;
+      const dx = cx - sunX, dy = cy - sunY;
+      const len = Math.hypot(dx, dy) || 1;
+      const ux = dx / len, uy = dy / len;
+      const px = -uy, py = ux;
+      near1x = cx + px * (base * 0.5); near1y = cy + py * (base * 0.5);
+      near2x = cx - px * (base * 0.5); near2y = cy - py * (base * 0.5);
+      far1x = near1x + ux * extentTree; far1y = near1y + uy * extentTree;
+      far2x = near2x + ux * extentTree; far2y = near2y + uy * extentTree;
     } else { continue; }
 
-    const dx = cx - sunX;
-    const dy = cy - sunY;
-    const len = Math.hypot(dx, dy) || 1;
-    const ux = dx / len; // unit vector away from sun
-    const uy = dy / len;
-    // perpendicular
-    const px = -uy; const py = ux;
-
-    const near1x = cx + px * (base * 0.5);
-    const near1y = cy + py * (base * 0.5);
-    const near2x = cx - px * (base * 0.5);
-    const near2y = cy - py * (base * 0.5);
-    const far1x = near1x + ux * extent;
-    const far1y = near1y + uy * extent;
-    const far2x = near2x + ux * extent;
-    const far2y = near2y + uy * extent;
-
     const grad = ctx.createLinearGradient(near1x, near1y, far1x, far1y);
-    grad.addColorStop(0, 'rgba(0,0,0,0.22)');
+    grad.addColorStop(0, 'rgba(0,0,0,0.28)');
     grad.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = grad;
     ctx.beginPath();
@@ -557,15 +574,15 @@ function drawVignette() {
   const rad = Math.hypot(canvas.width, canvas.height) * 0.6;
   const vg = ctx.createRadialGradient(canvas.width*0.4, canvas.height*0.45, rad*0.2, canvas.width*0.5, canvas.height*0.5, rad);
   vg.addColorStop(0, 'rgba(0,0,0,0)');
-  vg.addColorStop(1, 'rgba(0,0,0,0.35)');
+  vg.addColorStop(1, 'rgba(0,0,0,0.45)');
   ctx.fillStyle = vg;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // Left text panel vignette
   const panelWidth = Math.min(560, canvas.width * 0.55);
   const lg = ctx.createLinearGradient(0, 0, panelWidth, 0);
-  lg.addColorStop(0, 'rgba(0,0,0,0.42)');
-  lg.addColorStop(0.6, 'rgba(0,0,0,0.18)');
+  lg.addColorStop(0, 'rgba(0,0,0,0.5)');
+  lg.addColorStop(0.6, 'rgba(0,0,0,0.22)');
   lg.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.fillStyle = lg;
   ctx.fillRect(0, 0, panelWidth, canvas.height);
@@ -575,6 +592,17 @@ function animate() {
   // Clear with dark background
   ctx.fillStyle = BACKGROUND;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Ease parallax towards target
+  parallaxX += (parallaxTargetX - parallaxX) * 0.06;
+  parallaxY += (parallaxTargetY - parallaxY) * 0.06;
+  // Apply parallax to obstacle positions
+  for (const o of obstacles) {
+    const kx = (o.pf || 0.02) * 40; // max px shift
+    const ky = (o.pf || 0.02) * 24; // max py shift
+    o.x = o.baseX + parallaxX * kx;
+    o.y = o.baseY + parallaxY * ky;
+  }
   
   // Update and draw ripples (behind everything)
   updateRipples();
@@ -611,6 +639,14 @@ window.addEventListener('resize', () => {
   }
   
   ripples = [];
+});
+
+// Parallax input (mouse)
+window.addEventListener('mousemove', (e) => {
+  const nx = (e.clientX / window.innerWidth) - 0.5;
+  const ny = (e.clientY / window.innerHeight) - 0.5;
+  parallaxTargetX = Math.max(-1, Math.min(1, nx));
+  parallaxTargetY = Math.max(-1, Math.min(1, ny));
 });
 
 // Start animation
