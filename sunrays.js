@@ -53,6 +53,7 @@ function initializePositions() {
       width: 60, 
       height: canvas.height * 0.4,
       windows: true,
+      twinkle: false,
       pf: 0.02
     },
     { 
@@ -62,6 +63,7 @@ function initializePositions() {
       width: 45, 
       height: canvas.height * 0.35,
       windows: true,
+      twinkle: false,
       pf: 0.02
     },
     { 
@@ -71,6 +73,7 @@ function initializePositions() {
       width: 50, 
       height: canvas.height * 0.45,
       windows: true,
+      twinkle: false,
       pf: 0.02
     },
     
@@ -82,6 +85,7 @@ function initializePositions() {
       width: 40, 
       height: canvas.height * 0.25,
       windows: true,
+      twinkle: false,
       pf: 0.018
     },
     { 
@@ -91,6 +95,7 @@ function initializePositions() {
       width: 35, 
       height: canvas.height * 0.3,
       windows: true,
+      twinkle: false,
       pf: 0.018
     },
     
@@ -100,14 +105,15 @@ function initializePositions() {
     { type: 'tree', x: canvas.width * 0.61, y: horizonY - 22, radius: 44, pf: 0.03 },
     
     // More distant buildings (right side)
-    { type: 'building', x: canvas.width * 0.7,  y: horizonY - canvas.height * 0.22, width: 34, height: canvas.height * 0.22, windows: false, pf: 0.016 },
+    { type: 'building', x: canvas.width * 0.7,  y: horizonY - canvas.height * 0.22, width: 34, height: canvas.height * 0.22, windows: true, twinkle: true, pf: 0.016 },
     { 
       type: 'building',
       x: canvas.width * 0.75, 
       y: horizonY - canvas.height * 0.15, 
       width: 35, 
       height: canvas.height * 0.15,
-       windows: false,
+       windows: true,
+       twinkle: true,
        pf: 0.016
     },
     { 
@@ -116,13 +122,43 @@ function initializePositions() {
       y: horizonY - canvas.height * 0.18, 
       width: 25, 
       height: canvas.height * 0.18,
-      windows: false,
+      windows: true,
+      twinkle: true,
       pf: 0.016
     }
   ];
 
   // Save base positions for parallax
   for (const o of obstacles) { o.baseX = o.x; o.baseY = o.y; }
+  // Precompute window patterns for buildings
+  for (const o of obstacles) {
+    if (o.type === 'building' && o.windows) {
+      o.windowsPattern = buildWindowsPattern(o);
+    }
+  }
+}
+
+// Deterministic pseudo-random generator based on a seed
+function seededRandom(seed) {
+  let s = Math.sin(seed) * 10000;
+  return function() { s = Math.sin(s) * 10000; return s - Math.floor(s); };
+}
+
+function buildWindowsPattern(ob) {
+  const pattern = [];
+  const rows = Math.max(1, Math.floor(ob.height / 20));
+  const cols = Math.max(1, Math.floor(ob.width / 15));
+  const rnd = seededRandom(ob.baseX + ob.baseY + ob.width);
+  for (let r = 1; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if ((r + c) % 2 === 0 || rnd() > 0.6) { // semi-regular with slight variation
+        const wx = ob.baseX + 3 + c * 15;
+        const wy = ob.baseY + 5 + r * 20;
+        pattern.push({ dx: wx - ob.baseX, dy: wy - ob.baseY, w: 8, h: 12, phase: rnd() * Math.PI * 2 });
+      }
+    }
+  }
+  return pattern;
 }
 
 initializePositions();
@@ -451,20 +487,12 @@ function drawHorizonCityscape() {
       ctx.fillStyle = buildingGradient;
       ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
       
-      // Minimal building details
-      if (obstacle.windows) {
-        ctx.fillStyle = 'rgba(217, 164, 65, 0.22)';
-        const windowRows = Math.floor(obstacle.height / 20);
-        const windowCols = Math.floor(obstacle.width / 15);
-        
-        for (let row = 1; row < windowRows; row++) {
-          for (let col = 0; col < windowCols; col++) {
-            if (Math.random() > 0.6) { // Sparse window lighting
-              const winX = obstacle.x + 3 + col * 15;
-              const winY = obstacle.y + 5 + row * 20;
-              ctx.fillRect(winX, winY, 8, 12);
-            }
-          }
+      // Daytime windows: static reflections on left, gentle glints on right
+      if (obstacle.windows && obstacle.windowsPattern) {
+        for (const w of obstacle.windowsPattern) {
+          const a = obstacle.twinkle ? (0.08 + 0.10 * Math.max(0, Math.sin(time * 1.2 + w.phase))) : 0.12;
+          ctx.fillStyle = `rgba(217, 164, 65, ${a})`;
+          ctx.fillRect(obstacle.x + w.dx, obstacle.y + w.dy, w.w, w.h);
         }
       }
       
