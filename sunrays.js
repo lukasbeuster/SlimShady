@@ -38,7 +38,7 @@ let horizonY;
 function initializePositions() {
   sunX = canvas.width * 0.8; // Sun position (upper right)
   sunY = canvas.height * 0.2;
-  horizonY = canvas.height * 0.75; // Horizon line at 75% down
+  horizonY = canvas.height * 0.82; // Slightly lower horizon for better skyline
 
   // Horizon-based cityscape silhouette
   obstacles = [
@@ -87,34 +87,12 @@ function initializePositions() {
     },
     
     // Trees interspersed along horizon
-    { 
-      type: 'tree',
-      x: canvas.width * 0.35, 
-      y: horizonY - 15, 
-      radius: 30
-    },
-    { 
-      type: 'tree',
-      x: canvas.width * 0.55, 
-      y: horizonY - 10, 
-      radius: 25
-    },
-    { 
-      type: 'tree',
-      x: canvas.width * 0.62, 
-      y: horizonY - 20, 
-      radius: 35
-    },
+    { type: 'tree', x: canvas.width * 0.34, y: horizonY - 18, radius: 38 },
+    { type: 'tree', x: canvas.width * 0.50, y: horizonY - 14, radius: 32 },
+    { type: 'tree', x: canvas.width * 0.61, y: horizonY - 22, radius: 44 },
     
     // More distant buildings (right side)
-    { 
-      type: 'building',
-      x: canvas.width * 0.7, 
-      y: horizonY - canvas.height * 0.2, 
-      width: 30, 
-      height: canvas.height * 0.2,
-      windows: false
-    },
+    { type: 'building', x: canvas.width * 0.7,  y: horizonY - canvas.height * 0.22, width: 34, height: canvas.height * 0.22, windows: false },
     { 
       type: 'building',
       x: canvas.width * 0.75, 
@@ -438,7 +416,7 @@ function drawSun() {
 
 function drawHorizonCityscape() {
   // Draw horizon line
-  ctx.strokeStyle = 'rgba(149, 193, 31, 0.2)';
+  ctx.strokeStyle = 'rgba(217, 164, 65, 0.25)';
   ctx.lineWidth = 1;
   ctx.setLineDash([5, 15]);
   ctx.beginPath();
@@ -452,17 +430,17 @@ function drawHorizonCityscape() {
     if (obstacle.type === 'building') {
       // Professional building gradient
       const buildingGradient = ctx.createLinearGradient(obstacle.x, obstacle.y, obstacle.x, obstacle.y + obstacle.height);
-      buildingGradient.addColorStop(0, '#555555');
-      buildingGradient.addColorStop(0.2, SCL_DARK_GREEN);
-      buildingGradient.addColorStop(0.8, '#2a2a2a');
-      buildingGradient.addColorStop(1, '#1a1a1a');
+      buildingGradient.addColorStop(0, '#4f4f4f');
+      buildingGradient.addColorStop(0.25, '#2f2f2f');
+      buildingGradient.addColorStop(0.7, '#212121');
+      buildingGradient.addColorStop(1, '#181818');
       
       ctx.fillStyle = buildingGradient;
       ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
       
       // Minimal building details
       if (obstacle.windows) {
-        ctx.fillStyle = 'rgba(149, 193, 31, 0.2)';
+        ctx.fillStyle = 'rgba(217, 164, 65, 0.22)';
         const windowRows = Math.floor(obstacle.height / 20);
         const windowCols = Math.floor(obstacle.width / 15);
         
@@ -478,7 +456,7 @@ function drawHorizonCityscape() {
       }
       
       // Subtle building outline
-      ctx.strokeStyle = 'rgba(149, 193, 31, 0.3)';
+      ctx.strokeStyle = 'rgba(217, 164, 65, 0.28)';
       ctx.lineWidth = 0.5;
       ctx.strokeRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
       
@@ -486,12 +464,12 @@ function drawHorizonCityscape() {
       // Refined tree design
       const treeGradient = ctx.createRadialGradient(obstacle.x, obstacle.y, 0, obstacle.x, obstacle.y, obstacle.radius);
       treeGradient.addColorStop(0, SCL_GREEN);
-      treeGradient.addColorStop(0.7, SCL_DARK_GREEN);
-      treeGradient.addColorStop(1, '#1a2008');
+      treeGradient.addColorStop(0.6, SCL_DARK_GREEN);
+      treeGradient.addColorStop(1, '#0f1607');
       
       ctx.fillStyle = treeGradient;
-      ctx.shadowBlur = 8;
-      ctx.shadowColor = 'rgba(149, 193, 31, 0.3)';
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = 'rgba(217, 164, 65, 0.28)';
       ctx.beginPath();
       ctx.arc(obstacle.x, obstacle.y, obstacle.radius, 0, Math.PI * 2);
       ctx.fill();
@@ -526,6 +504,73 @@ function updateRipples() {
   }
 }
 
+// Compute and draw simple soft shadows cast by obstacles away from the sun
+function drawShadows() {
+  ctx.save();
+  ctx.globalCompositeOperation = 'multiply';
+  for (const obstacle of obstacles) {
+    let cx, cy, extent, base;
+    if (obstacle.type === 'building') {
+      cx = obstacle.x + obstacle.width / 2;
+      cy = obstacle.y + obstacle.height / 2;
+      base = Math.max(12, obstacle.width * 0.8);
+      extent = Math.max(canvas.width, canvas.height) * 0.9;
+    } else if (obstacle.type === 'tree') {
+      cx = obstacle.x; cy = obstacle.y; base = obstacle.radius * 1.6; extent = obstacle.radius * 12;
+    } else { continue; }
+
+    const dx = cx - sunX;
+    const dy = cy - sunY;
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len; // unit vector away from sun
+    const uy = dy / len;
+    // perpendicular
+    const px = -uy; const py = ux;
+
+    const near1x = cx + px * (base * 0.5);
+    const near1y = cy + py * (base * 0.5);
+    const near2x = cx - px * (base * 0.5);
+    const near2y = cy - py * (base * 0.5);
+    const far1x = near1x + ux * extent;
+    const far1y = near1y + uy * extent;
+    const far2x = near2x + ux * extent;
+    const far2y = near2y + uy * extent;
+
+    const grad = ctx.createLinearGradient(near1x, near1y, far1x, far1y);
+    grad.addColorStop(0, 'rgba(0,0,0,0.22)');
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(near1x, near1y);
+    ctx.lineTo(near2x, near2y);
+    ctx.lineTo(far2x, far2y);
+    ctx.lineTo(far1x, far1y);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+// Darken edges and subtly mask behind text area to improve legibility
+function drawVignette() {
+  // Global edge vignette
+  const rad = Math.hypot(canvas.width, canvas.height) * 0.6;
+  const vg = ctx.createRadialGradient(canvas.width*0.4, canvas.height*0.45, rad*0.2, canvas.width*0.5, canvas.height*0.5, rad);
+  vg.addColorStop(0, 'rgba(0,0,0,0)');
+  vg.addColorStop(1, 'rgba(0,0,0,0.35)');
+  ctx.fillStyle = vg;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Left text panel vignette
+  const panelWidth = Math.min(560, canvas.width * 0.55);
+  const lg = ctx.createLinearGradient(0, 0, panelWidth, 0);
+  lg.addColorStop(0, 'rgba(0,0,0,0.42)');
+  lg.addColorStop(0.6, 'rgba(0,0,0,0.18)');
+  lg.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = lg;
+  ctx.fillRect(0, 0, panelWidth, canvas.height);
+}
+
 function animate() {
   // Clear with dark background
   ctx.fillStyle = BACKGROUND;
@@ -534,6 +579,9 @@ function animate() {
   // Update and draw ripples (behind everything)
   updateRipples();
   drawRipples();
+
+  // Draw soft shadows from skyline before rays for better readability
+  drawShadows();
   
   // Update and draw rays
   for (const ray of rays) {
@@ -544,6 +592,9 @@ function animate() {
   // Draw sun and refined cityscape
   drawSun();
   drawHorizonCityscape();
+
+  // Subtle vignette to improve text legibility
+  drawVignette();
 
   time += 0.02; // Slower, more professional animation
   requestAnimationFrame(animate);
