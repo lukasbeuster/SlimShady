@@ -33,6 +33,7 @@ let currentBuurtLayer = null;
 let loadedBuurten = new Map();
 let mapInitialized = false;
 let isDetailView = false;
+// state for current selection (not used for now)
 
 // Initialize map when section becomes visible
 function initializeMap() {
@@ -145,7 +146,7 @@ async function loadMapData() {
         const coverage = props.coverage_excellent || 0;
         const category = getShadeCategory(meanShade);
         const color = getShadeColor(meanShade);
-        
+
         layer.bindTooltip(`
           <strong>${buurtName}</strong><br>
           <span style="display:inline-flex;align-items:center;gap:6px;">
@@ -154,40 +155,22 @@ async function loadMapData() {
           </span><br>
           Average Shade Availability: ${(meanShade * 100).toFixed(0)}%<br>
           ${segmentCount} sidewalk segments
-        `, { 
-          permanent: false, 
+        `, {
+          permanent: false,
           direction: 'top',
           className: 'custom-tooltip'
         });
 
         layer.on('mouseover', (e) => {
-          if (isDetailView) {
-            // In detail view: outline-only highlight to aid selection
-            e.target.setStyle({
-              fillOpacity: 0,
-              weight: 3,
-              color: '#bbbbbb',
-              opacity: 1
-            });
-            e.target.bringToFront();
-            return;
-          }
-          // Overview: subtle fill highlight
-          layer.setStyle({ 
-            fillOpacity: 0.8,
-            weight: 2
-          });
+          if (isDetailView) return; // no heavy hover in detail view
+          layer.setStyle({ fillOpacity: 0.8, weight: 2 });
         });
-        
+
         layer.on('mouseout', (e) => {
-          if (isDetailView) {
-            // ensure faint style persists during detail view (no fill highlight)
-            e.target.setStyle({ fillOpacity: 0.1, opacity: 0.3, weight: 1, color: '#333' });
-            return;
-          }
+          if (isDetailView) return;
           buurtenLayer.resetStyle(e.target);
         });
-        
+
         layer.on('click', (e) => {
           loadNeighborhoodDetails(buurtCode, buurtName, meanShade, segmentCount, coverage, e.target);
         });
@@ -206,6 +189,60 @@ async function loadMapData() {
   hideLoading();
 }
 
+// Build popup HTML for a sidewalk feature
+function buildSidewalkPopup(props, shadeIndex) {
+  function val(v) { return (v === null || v === undefined) ? '—' : v; }
+  function pct(p) { return (p === null || p === undefined) ? '—' : `${Math.round(p)}%`; }
+  const yrBuilt = val(props.Jaar_van_aanleg);
+  const yrConserve = val(props.Jaar_laatste_conservering);
+  const yrMaint = val(props.Jaar_uitgevoerd_onderhoud);
+
+  const p1000 = props.shade_percent_at_1000;
+  const p1300 = props.shade_percent_at_1300;
+  const p1530 = props.shade_percent_at_1530;
+  const p1800 = props.shade_percent_at_1800;
+  const times = [
+    { t: '10:00', v: p1000 },
+    { t: '13:00', v: p1300 },
+    { t: '15:30', v: p1530 },
+    { t: '18:00', v: p1800 }
+  ];
+
+  // Mini inline SVG bar profile
+  const w = 240, h = 60, pad = 6, barW = (w - pad*2 - 3*8) / 4; // 8px gaps
+  let bars = '';
+  times.forEach((d, i) => {
+    const valPct = Math.max(0, Math.min(100, Number.isFinite(d.v) ? d.v : 0));
+    const barH = (h - pad*2 - 16) * (valPct/100);
+    const x = pad + i * (barW + 8);
+    const y = h - pad - barH;
+    const color = getShadeColor(valPct/100);
+    bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${barH.toFixed(1)}" rx="2" fill="${color}" stroke="#222" stroke-width="0.5" />`;
+    bars += `<text x="${x + barW/2}" y="${h - 2}" fill="#aaa" font-size="9" text-anchor="middle">${d.t}</text>`;
+  });
+  const svg = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">${bars}</svg>`;
+
+  return `
+    <div style="min-width:240px;">
+      <div style="font-size:12px;color:#cfcfcf;margin-bottom:8px;">
+        <div><span style="color:#888;">Year of construction:</span> <strong>${yrBuilt}</strong></div>
+        <div><span style="color:#888;">Last conservation:</span> <strong>${yrConserve}</strong></div>
+        <div><span style="color:#888;">Last maintenance:</span> <strong>${yrMaint}</strong></div>
+      </div>
+      <div style="font-size:12px;color:#cfcfcf;margin-bottom:6px;">
+        <span style="color:#95C11F;">Daily shade profile</span>
+        <span style="color:#888;"> (10:00 / 13:00 / 15:30 / 18:00)</span>
+      </div>
+      <div style="margin-bottom:6px;">${svg}</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:#cfcfcf;">
+        <div><span style="color:#888;">10:00</span> <strong>${pct(p1000)}</strong></div>
+        <div><span style="color:#888;">13:00</span> <strong>${pct(p1300)}</strong></div>
+        <div><span style="color:#888;">15:30</span> <strong>${pct(p1530)}</strong></div>
+        <div><span style="color:#888;">18:00</span> <strong>${pct(p1800)}</strong></div>
+      </div>
+    </div>
+  `;
+}
 // Enable wheel zoom only with Ctrl/⌘ and show a hint
 function setupWheelZoomHint() {
   const container = map.getContainer();
@@ -303,10 +340,14 @@ function showNeighborhoodOverview(buurtName, meanShade, segmentCount, coverage) 
 function displayNeighborhoodDetails(buurtData, buurtName, meanShade, segmentCount, coverage, buurtLayer) {
   // Switch to detail view
   isDetailView = true;
+  activeSidewalkLayer = null;
   
-  // Fade neighborhood layer and remove any lingering hover weights
+  // Fade neighborhood layer and suspend its interactivity during detail view
   if (buurtenLayer) {
-    buurtenLayer.eachLayer(l => l.setStyle({ fillOpacity: 0.1, opacity: 0.3, weight: 1 }));
+    buurtenLayer.eachLayer(l => {
+      l.setStyle({ fillOpacity: 0.1, opacity: 0.3, weight: 1, color: '#333' });
+      // keep handlers; only reduce visual emphasis
+    });
   }
   
   // Remove previous detail layer
@@ -333,19 +374,43 @@ function displayNeighborhoodDetails(buurtData, buurtName, meanShade, segmentCoun
       const category = getShadeCategory(shadeIndex);
       const chip = getShadeColor(shadeIndex);
       
-      layer.bindTooltip(`
-        <strong>Sidewalk Segment</strong><br>
-        <span style="display:inline-flex;align-items:center;gap:6px;">
-          <span style="display:inline-block;width:10px;height:10px;background:${chip};border:1px solid #555;"></span>
-          <span>Shade Category: ${category}</span>
-        </span><br>
-        Shade Availability: ${shadeIndex != null ? (shadeIndex*100).toFixed(0) + '%' : 'N/A'}<br>
-        ID: ${guid || 'N/A'}
-      `, { 
+      // Inline rich tooltip (no click needed)
+      const yrBuilt = (feature.properties.Jaar_van_aanleg ?? '—');
+      const yrConserve = (feature.properties.Jaar_laatste_conservering ?? '—');
+      const yrMaint = (feature.properties.Jaar_uitgevoerd_onderhoud ?? '—');
+      const p1000 = feature.properties.shade_percent_at_1000;
+      const p1300 = feature.properties.shade_percent_at_1300;
+      const p1530 = feature.properties.shade_percent_at_1530;
+      const p1800 = feature.properties.shade_percent_at_1800;
+      const bar = (p) => `<span style=\"display:inline-block;height:6px;width:40px;background:${getShadeColor((p||0)/100)};opacity:0.9;\"></span>`;
+      const tipHtml = `
+        <div style="min-width:240px;">
+          <div style="font-weight:600;margin-bottom:4px;">Sidewalk Segment</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+            <span style="display:inline-block;width:10px;height:10px;background:${chip};border:1px solid #555;"></span>
+            <span>Shade Category: ${category}</span>
+            <span style="margin-left:6px;color:#888;">(${shadeIndex != null ? (shadeIndex*100).toFixed(0)+'%' : 'N/A'})</span>
+          </div>
+          <div style="font-size:11px;color:#cfcfcf;line-height:1.6;margin-bottom:4px;">
+            <div><span style="color:#888;">Year of construction:</span> <strong>${yrBuilt}</strong></div>
+            <div><span style="color:#888;">Last conservation:</span> <strong>${yrConserve}</strong></div>
+            <div><span style="color:#888;">Last maintenance:</span> <strong>${yrMaint}</strong></div>
+          </div>
+          <div style="font-size:11px;color:#95C11F;margin-bottom:2px;">Daily shade</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:10px;color:#aaa;">
+            <div>10:00<br>${bar(p1000)}</div>
+            <div>13:00<br>${bar(p1300)}</div>
+            <div>15:30<br>${bar(p1530)}</div>
+            <div>18:00<br>${bar(p1800)}</div>
+          </div>
+        </div>`;
+      layer.bindTooltip(tipHtml, { 
         permanent: false, 
         direction: 'top',
         className: 'custom-tooltip'
       });
+
+      // No click popup — hover shows rich info
     }
   }).addTo(map);
   currentBuurtLayer.bringToFront();
@@ -438,11 +503,22 @@ function returnToOverview() {
     map.removeLayer(currentBuurtLayer);
     currentBuurtLayer = null;
   }
+  // Close any open popups/tooltips
+  try { map.closePopup(); } catch (e) {}
+  try { map.closeTooltip(); } catch (e) {}
   
   // Restore neighborhood layer
   if (buurtenLayer) {
     buurtenLayer.setStyle((feature) => styleNeighborhoods(feature));
-    map.fitBounds(buurtenLayer.getBounds(), { padding: [20, 20] });
+    // Ensure tooltips work (rebind if needed)
+    buurtenLayer.eachLayer((l) => {
+      // If tooltips were auto-closed, let Leaflet recreate on demand via existing bindings
+      if (l.closeTooltip) { try { l.closeTooltip(); } catch(e){} }
+    });
+    // Force an outward zoom using a maxZoom cap
+    const cityBounds = buurtenLayer.getBounds();
+    if (map.stop) map.stop(); // halt any ongoing animations to avoid artifacts
+    map.fitBounds(cityBounds, { padding: [20, 20], maxZoom: 12, animate: true });
   }
   
   hideInfoPanel();
