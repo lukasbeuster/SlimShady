@@ -19,12 +19,13 @@ resizeCanvas();
 // SCL Colors for dark mode
 const SCL_GREEN = '#95C11F';
 const SCL_DARK_GREEN = '#5B7026';
+const SCL_AMBER = '#D9A441'; // warm amber for sun accents
 const BACKGROUND = '#1a1a1a';
 
 // CONFIGURABLE CONSTANTS
 const NUM_RAYS = 150; // More rays for denser coverage
-const RIPPLE_INTERVAL = 2000; // Time between ripples in milliseconds
-const MAX_CONCURRENT_RIPPLES = 3;
+const RIPPLE_INTERVAL = 2000; // Time between ripples in milliseconds (keep timing)
+const MAX_CONCURRENT_RIPPLES = 5; // allow more simultaneous pulses
 
 // Animation variables
 let time = 0;
@@ -250,9 +251,9 @@ class Ripple {
     for (const segment of this.segments) {
       if (this.radius > segment.maxRadius) continue;
       
-      const alpha = this.opacity * 0.25;
-      ctx.strokeStyle = `rgba(149, 193, 31, ${alpha})`;
-      ctx.lineWidth = 1.5;
+      const alpha = this.opacity * 0.32; // slightly more visible
+      ctx.strokeStyle = `rgba(217, 164, 65, ${alpha})`; // amber-toned ripple
+      ctx.lineWidth = 1.7;
       ctx.setLineDash([2, 4]);
       
       ctx.beginPath();
@@ -289,18 +290,18 @@ class SunRay {
     const gradient = ctx.createLinearGradient(sunX, sunY, endX, endY);
     
     if (this.blocked) {
-      gradient.addColorStop(0, `rgba(255, 255, 120, ${this.currentOpacity * 0.4})`);
-      gradient.addColorStop(0.7, `rgba(149, 193, 31, ${this.currentOpacity * 0.2})`);
-      gradient.addColorStop(1, `rgba(149, 193, 31, 0.05)`);
+      gradient.addColorStop(0, `rgba(255, 236, 170, ${this.currentOpacity * 0.48})`);
+      gradient.addColorStop(0.7, `rgba(217, 164, 65, ${this.currentOpacity * 0.28})`);
+      gradient.addColorStop(1, `rgba(217, 164, 65, 0.08)`);
     } else {
-      gradient.addColorStop(0, `rgba(255, 255, 100, ${this.currentOpacity * 0.5})`);
-      gradient.addColorStop(0.3, `rgba(149, 193, 31, ${this.currentOpacity * 0.3})`);
-      gradient.addColorStop(0.8, `rgba(149, 193, 31, ${this.currentOpacity * 0.1})`);
-      gradient.addColorStop(1, `rgba(149, 193, 31, 0)`);
+      gradient.addColorStop(0, `rgba(255, 236, 170, ${this.currentOpacity * 0.55})`);
+      gradient.addColorStop(0.35, `rgba(217, 164, 65, ${this.currentOpacity * 0.34})`);
+      gradient.addColorStop(0.8, `rgba(217, 164, 65, ${this.currentOpacity * 0.14})`);
+      gradient.addColorStop(1, `rgba(217, 164, 65, 0)`);
     }
 
     ctx.strokeStyle = gradient;
-    ctx.lineWidth = this.blocked ? 1 : 1.2;
+    ctx.lineWidth = this.blocked ? 1.05 : 1.3; // slightly stronger
     
     ctx.beginPath();
     ctx.moveTo(sunX, sunY);
@@ -386,7 +387,7 @@ const rays = [];
 for (let i = 0; i < NUM_RAYS; i++) {
   const angle = (i / NUM_RAYS) * Math.PI * 2;
   const length = Math.min(canvas.width, canvas.height) * 1.1;
-  const baseOpacity = 0.08 + Math.random() * 0.04; // More subtle
+  const baseOpacity = 0.10 + Math.random() * 0.05; // Slightly more prominent
   rays.push(new SunRay(angle, length, baseOpacity));
 }
 
@@ -400,13 +401,13 @@ let lastRippleTime = 0;
 
 function drawSun() {
   // More subtle sun with professional look
-  const pulseIntensity = 0.8 + Math.sin(time * 0.8) * 0.1;
+  const pulseIntensity = 0.85 + Math.sin(time * 0.8) * 0.12;
   
   // Outer glow
   const outerGlow = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 70 * pulseIntensity);
-  outerGlow.addColorStop(0, `rgba(255, 255, 150, ${pulseIntensity * 0.6})`);
-  outerGlow.addColorStop(0.5, `rgba(149, 193, 31, ${pulseIntensity * 0.3})`);
-  outerGlow.addColorStop(1, 'rgba(149, 193, 31, 0)');
+  outerGlow.addColorStop(0, `rgba(255, 236, 170, ${pulseIntensity * 0.65})`); // warm yellow center
+  outerGlow.addColorStop(0.5, `rgba(217, 164, 65, ${pulseIntensity * 0.35})`); // amber mid
+  outerGlow.addColorStop(1, 'rgba(217, 164, 65, 0)'); // fade out in amber
   
   ctx.fillStyle = outerGlow;
   ctx.beginPath();
@@ -415,9 +416,9 @@ function drawSun() {
 
   // Inner glow
   const innerGlow = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 25);
-  innerGlow.addColorStop(0, '#FFFF80');
-  innerGlow.addColorStop(0.7, '#FFE55C');
-  innerGlow.addColorStop(1, SCL_GREEN);
+  innerGlow.addColorStop(0, '#FFF5B8');
+  innerGlow.addColorStop(0.7, '#FFE08A');
+  innerGlow.addColorStop(1, SCL_AMBER);
   
   ctx.fillStyle = innerGlow;
   ctx.beginPath();
@@ -428,7 +429,7 @@ function drawSun() {
   const pulseSize = 12 + Math.sin(time * 1.5) * 2;
   ctx.fillStyle = '#FFFFFF';
   ctx.shadowBlur = 15;
-  ctx.shadowColor = '#FFFF00';
+  ctx.shadowColor = '#FFD37A';
   ctx.beginPath();
   ctx.arc(sunX, sunY, pulseSize, 0, Math.PI * 2);
   ctx.fill();
@@ -567,5 +568,8 @@ animate();
 // Create initial ripple
 setTimeout(() => {
   createRipple();
+  // Stagger a couple more initial pulses for a richer feel
+  setTimeout(createRipple, 300);
+  setTimeout(createRipple, 600);
 }, 1500);
 });
