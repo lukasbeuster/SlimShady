@@ -14,6 +14,9 @@ function resizeCanvas() {
   canvas.height = window.innerHeight;
 }
 
+// Expose for layout scripts
+window.resizeCanvas = resizeCanvas;
+
 resizeCanvas();
 
 // SCL Colors for dark mode
@@ -34,6 +37,12 @@ let time = 0;
 let sunX, sunY;
 let obstacles = [];
 let parallaxX = 0, parallaxY = 0, parallaxTargetX = 0, parallaxTargetY = 0;
+
+// Foreground promenades and animated pedestrians
+let promenades = [];
+let pedestrians = [];
+let exposureNow = 0;      // fraction shaded [0..1]
+let exposureDisplay = 0;  // eased display value
 let ripples = [];
 let horizonY;
 
@@ -135,6 +144,25 @@ function initializePositions() {
     if (o.type === 'building' && o.windows) {
       o.windowsPattern = buildWindowsPattern(o);
     }
+  }
+
+  // Define two promenades (sidewalks) across the foreground
+  const yBase = Math.min(canvas.height - 80, horizonY + 40);
+  promenades = [
+    { x1: canvas.width * 0.08, y1: yBase, x2: canvas.width * 0.92, y2: yBase, width: 18 },
+    { x1: canvas.width * 0.15, y1: yBase + 36, x2: canvas.width * 0.85, y2: yBase + 36, width: 14 }
+  ];
+  // Seed pedestrians
+  const seedCount = 10;
+  pedestrians = [];
+  for (let i = 0; i < seedCount; i++) {
+    const p = promenades[i % promenades.length];
+    pedestrians.push({
+      path: p,
+      t: Math.random(),
+      speed: 0.02 + Math.random() * 0.03,
+      radius: 4 + Math.random() * 2
+    });
   }
 }
 
@@ -525,6 +553,191 @@ function drawHorizonCityscape() {
   }
 }
 
+// Ray/occlusion helpers for pedestrians
+function isShaded(px, py) {
+  // cast ray from sun to (px,py) and test intersections with obstacles
+  const dx = px - sunX, dy = py - sunY;
+  const L = Math.hypot(dx, dy) || 1;
+  const ux = dx / L, uy = dy / L; // normalized direction
+
+  // Liang–Barsky style slab test for axis-aligned rectangles
+  function rayHitsRect(r) {
+    const left = r.x, right = r.x + r.width, top = r.y, bottom = r.y + r.height;
+    let tNear = 0, tFar = L; // limit within segment length
+
+    // X slab
+    if (Math.abs(ux) < 1e-6) {
+      if (sunX < left || sunX > right) return false;
+    } else {
+      let t1 = (left - sunX) / ux;
+      let t2 = (right - sunX) / ux;
+      if (t1 > t2) [t1, t2] = [t2, t1];
+      tNear = Math.max(tNear, t1);
+      tFar = Math.min(tFar, t2);
+      if (tNear > tFar) return false;
+    }
+    // Y slab
+    if (Math.abs(uy) < 1e-6) {
+      if (sunY < top || sunY > bottom) return false;
+    } else {
+      let t1 = (top - sunY) / uy;
+      let t2 = (bottom - sunY) / uy;
+      if (t1 > t2) [t1, t2] = [t2, t1];
+      tNear = Math.max(tNear, t1);
+      tFar = Math.min(tFar, t2);
+      if (tNear > tFar) return false;
+    }
+    return tNear > 0 && tNear < L;
+  }
+
+  // Circle intersection: t = dot(dir, c) ± sqrt(disc)
+  function rayHitsCircle(c) {
+    const cx = c.x - sunX, cy = c.y - sunY;
+    const dot = ux*cx + uy*cy;
+    const disc = dot*dot - (cx*cx + cy*cy - c.radius*c.radius);
+    if (disc < 0) return false;
+    const t = dot - Math.sqrt(disc);
+    return t > 0 && t < L;
+  }
+  for (const o of obstacles) {
+    if (o.type === 'building' && rayHitsRect(o)) return true;
+    if (o.type === 'tree' && rayHitsCircle(o)) return true;
+  }
+  return false;
+}
+
+function updatePedestrians() {
+  let shadedCount = 0;
+  for (const p of pedestrians) {
+    p.t += p.speed * 0.006; // scale with frame delta
+    if (p.t > 1) p.t -= 1;
+    const x = p.path.x1 + (p.path.x2 - p.path.x1) * p.t;
+    const y = p.path.y1 + (p.path.y2 - p.path.y1) * p.t;
+    p.x = x; p.y = y;
+    p.shaded = isShaded(x, y);
+    if (p.shaded) shadedCount++;
+  }
+  const ratio = pedestrians.length ? shadedCount / pedestrians.length : 0;
+  // ease display value
+  exposureDisplay += (ratio - exposureDisplay) * 0.1;
+  exposureNow = ratio;
+}
+
+function drawPromenades() {
+  ctx.save();
+  for (const s of promenades) {
+    // subtle path
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = s.width;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(s.x1, s.y1);
+    ctx.lineTo(s.x2, s.y2);
+    ctx.stroke();
+    // dashed center line
+    ctx.setLineDash([6, 10]);
+    ctx.strokeStyle = 'rgba(217,164,65,0.12)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(s.x1, s.y1);
+    ctx.lineTo(s.x2, s.y2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  ctx.restore();
+}
+
+function drawPedestrians() {
+  ctx.save();
+  for (const p of pedestrians) {
+    const x = p.x, y = p.y;
+    const col = p.shaded ? SCL_GREEN : SCL_AMBER;
+
+    // small shadow wedge away from sun
+    const dx = x - sunX, dy = y - sunY; const L = Math.hypot(dx, dy) || 1; const ux = dx/L, uy = dy/L; const px = -uy, py = ux;
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath();
+    ctx.moveTo(x + px*2, y + py*2);
+    ctx.lineTo(x - px*2, y - py*2);
+    ctx.lineTo(x - px*2 + ux*24, y - py*2 + uy*24);
+    ctx.lineTo(x + px*2 + ux*24, y + py*2 + uy*24);
+    ctx.closePath();
+    ctx.fill();
+
+    // walker
+    ctx.fillStyle = col;
+    ctx.strokeStyle = '#222';
+    ctx.lineWidth = 0.6;
+    ctx.beginPath();
+    ctx.arc(x, y, p.radius, 0, Math.PI*2);
+    ctx.fill();
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawExposureMeter() {
+  // Responsive margins mirroring header paddings
+  const side = (canvas.width <= 768) ? 24 : (canvas.width <= 1024 ? 40 : 60);
+  const bottom = (canvas.width <= 768) ? 24 : (canvas.width <= 1024 ? 32 : 40);
+  const w = 180, h = 52, r = 6;
+  // bottom-right placement aligned to header right margin
+  const x = canvas.width - w - side;
+  const y = canvas.height - h - bottom;
+  // panel
+  ctx.save();
+  ctx.fillStyle = 'rgba(0,0,0,0.34)';
+  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+  ctx.lineWidth = 1;
+  // rounded rect
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w, y, x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r);
+  ctx.arcTo(x, y, x+w, y, r);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // title
+  ctx.fillStyle = '#cfcfcf';
+  ctx.font = '11px Roboto, sans-serif';
+  ctx.fillText('Sun Exposure (now)', x + 10, y + 16);
+
+  // bars
+  const barX = x + 10, barY = y + 24, barW = w - 20, barH = 10;
+  const shadedFracW = Math.max(0, Math.min(1, exposureDisplay)) * barW;
+  // background
+  ctx.fillStyle = 'rgba(255,255,255,0.05)';
+  ctx.fillRect(barX, barY, barW, barH);
+  // shaded (green) left
+  ctx.fillStyle = SCL_GREEN;
+  ctx.fillRect(barX, barY, shadedFracW, barH);
+  // exposed (amber) right
+  ctx.fillStyle = SCL_AMBER;
+  ctx.fillRect(barX + shadedFracW, barY, barW - shadedFracW, barH);
+
+  // legend
+  ctx.fillStyle = '#8a8a8a';
+  ctx.font = '10px Roboto, sans-serif';
+  const pctShaded = Math.round(exposureDisplay * 100);
+  const shadedStr = `Shaded ${pctShaded}%`;
+  const expoStr = `Exposed ${100 - pctShaded}%`;
+  const shadedLabelW = ctx.measureText(shadedStr).width;
+  const expoLabelW = ctx.measureText(expoStr).width;
+  const labelY = barY + barH + 14;
+  // Left label (shaded)
+  ctx.fillStyle = SCL_GREEN; ctx.fillRect(barX, barY + barH + 6, 8, 8);
+  ctx.fillStyle = '#8a8a8a'; ctx.fillText(shadedStr, barX + 12, labelY);
+  // Right label (exposed), aligned from the right edge
+  const rightEdge = x + w - 10; // 10px padding inside panel
+  const expoLabelX = rightEdge - expoLabelW;
+  ctx.fillStyle = SCL_AMBER; ctx.fillRect(expoLabelX - 12, barY + barH + 6, 8, 8);
+  ctx.fillStyle = '#8a8a8a'; ctx.fillText(expoStr, expoLabelX, labelY);
+  ctx.restore();
+}
+
 function drawRipples() {
   for (const ripple of ripples) {
     ripple.draw();
@@ -638,6 +851,8 @@ function animate() {
 
   // Draw soft shadows from skyline before rays for better readability
   drawShadows();
+  // Foreground promenades receive rays/shadows too
+  drawPromenades();
   
   // Update and draw rays
   for (const ray of rays) {
@@ -651,6 +866,11 @@ function animate() {
 
   // Subtle vignette to improve text legibility
   drawVignette();
+
+  // Pedestrians at the very end for crispness
+  updatePedestrians();
+  drawPedestrians();
+  drawExposureMeter();
 
   time += 0.02; // Slower, more professional animation
   requestAnimationFrame(animate);
