@@ -248,15 +248,29 @@ function setupWheelZoomHint() {
   const container = map.getContainer();
   const hint = document.getElementById('zoomHint');
   let disableTimer = null;
+  let keyZoom = false; // allow 'Z' key as an alternative modifier
   
   function showHint() { if (hint) hint.classList.add('show'); }
   function hideHint() { if (hint) hint.classList.remove('show'); }
+
+  // Update hint copy for Mac friendliness
+  if (hint) {
+    hint.textContent = 'Hold Ctrl/⌘/Alt or press Z + scroll to zoom';
+  }
+
+  // Track a simple keyboard modifier (Z key)
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'z' || e.key === 'Z') keyZoom = true;
+  });
+  window.addEventListener('keyup', (e) => {
+    if (e.key === 'z' || e.key === 'Z') keyZoom = false;
+  });
 
   container.addEventListener('mouseenter', () => { showHint(); });
   container.addEventListener('mouseleave', () => { hideHint(); map.scrollWheelZoom.disable(); });
 
   container.addEventListener('wheel', (e) => {
-    if (e.ctrlKey || e.metaKey) {
+    if (e.ctrlKey || e.metaKey || e.altKey || keyZoom) {
       // use wheel to zoom map and not scroll page
       e.preventDefault();
       hideHint();
