@@ -189,7 +189,7 @@
       background: #0a0a0a;
       border-top: 1px solid #1f1f1f;
       border-bottom: 1px solid #1f1f1f;
-      padding: 80px 60px;
+      padding: 28px 60px 16px; /* tighter vertical fit */
     }
 
     .about-inner {
@@ -209,17 +209,17 @@
       font-size: clamp(28px, 3.6vw, 40px);
       font-weight: 400;
       letter-spacing: -0.01em;
-      line-height: 1.2;
-      margin-bottom: 18px;
+      line-height: 1.15;
+      margin-bottom: 10px;
       color: #ffffff;
     }
 
     .about-layout {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 20px;
+      gap: 14px;
       align-items: start;
-      margin-top: 20px;
+      margin-top: 10px;
     }
 
     .about-lead {
@@ -228,7 +228,7 @@
       font-size: 16px;
       line-height: 1.8;
       max-width: 900px;
-      margin-bottom: 36px;
+      margin-bottom: 16px;
     }
 
     .about-grid { display: none; }
@@ -324,7 +324,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 16px;
-      margin-top: 28px;
+      margin-top: 12px;
       flex-wrap: wrap;
     }
 
@@ -610,8 +610,8 @@
         padding-right: 40px;
       }
       .text-panel { padding: 24px 28px; max-width: 600px; }
-      .about-section { padding: 56px 40px; }
-      .about-layout { grid-template-columns: 1fr; gap: 18px; }
+      .about-section { padding: 22px 40px 12px; }
+      .about-layout { grid-template-columns: 1fr; gap: 12px; }
       
       .map-controls, .info-panel {
         right: 15px;
@@ -635,8 +635,8 @@
       .header-info {
         text-align: left;
       }
-      .about-section { padding: 40px 24px; }
-      .about-layout { grid-template-columns: 1fr; gap: 16px; }
+      .about-section { padding: 20px 20px 12px; }
+      .about-layout { grid-template-columns: 1fr; gap: 10px; }
       .about-visuals { grid-template-columns: 1fr; }
       .about-right { border-left: 0; padding-left: 0; }
       .palette-comparison { grid-template-columns: 1fr; gap: 18px; }
