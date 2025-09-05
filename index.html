@@ -680,22 +680,24 @@
     <!-- <p class="about-lead"> -->
     <p>
       Shade is one of the simplest and most effective ways to reduce heat exposure in cities.
-      It’s what keeps a walk bearable on a hot day. But not all streets are created equal — and until now,
+      It’s what keeps a walk bearable on a hot day. But not all streets are created equal, and until now,
       city planners haven’t had the tools to see where shade is missing, or how to provide it where it matters most.
     </p>
 
     <p>
-      Shade improves urban comfort by lowering <strong>Mean Radiant Temperature (MRT)</strong> — the key driver of how hot we feel.
+      Shade improves urban comfort by lowering <strong>Mean Radiant Temperature (MRT)</strong>, the key driver of how hot we feel.
       Unlike air temperature, MRT can be directly shaped by urban design: trees, buildings, materials, and geometry.
       In fact, research shows that reducing radiation exposure through shade is often more effective than lowering air temperature alone.
     </p>
     <br>
 
     <p>
-      This map shows the <strong>Shade Availability Index (SAI)</strong>: a value between 0 and 1 indicating how much shade is available
-      on sidewalks during the day. It’s a method developed by Or Aleksandrowicz and adapted here for Amsterdam’s context.
-      While Israeli planning guidelines use a 50% minimum threshold, we apply the <strong>30% shade benchmark</strong> suggested by
-      recent research at the Amsterdam University of Applied Sciences (HvA), to better reflect local climate and sun angles.
+      This map shows the <strong>Shade Availability Index (SAI)</strong>: the percentage of daytime intervals in which a sidewalk
+      segment is sufficiently shaded, above a city-specific threshold (typically 30–50%). For Amsterdam, we evaluate intervals
+      between <strong>09:00 and 18:00</strong> on the summer solstice. We classify SAI into four categories tailored to planning use:
+      <strong>Poor</strong> (< 50%), <strong>Acceptable</strong> (50–70%), <strong>Very good</strong> (70–90%), and <strong>Excellent</strong> (≥ 90%).
+      The approach draws on the <em>Guidelines for Applying Quantitative Shade Indicators in Urban Planning in Israel</em>
+      (Or Aleksandrowicz et al., 2025).
     </p>
 
     <div class="about-layout">
@@ -729,11 +731,11 @@
       Related resources: 
       <a href="https://www.hva.nl/onderzoeksresultaten/2020/6/coolkit" target="_blank" rel="noopener">CoolKit</a>
       and 
-      <a href="https://oraleks.net.technion.ac.il/files/2025/06/Aleksandrowicz-et-al.-Guidelines-for-Applying-Quantitative-Shade-Indicators.pdf" target="_blank" rel="noopener">Guidelines for Applying Quantitative Shade Indicators</a>.
+      <a href="https://oraleks.net.technion.ac.il/files/2025/06/Aleksandrowicz-et-al.-Guidelines-for-Applying-Quantitative-Shade-Indicators.pdf" target="_blank" rel="noopener">Guidelines for Applying Quantitative Shade Indicators in Urban Planning in Israel (Or Aleksandrowicz et&nbsp;al., Derech Tzel, 2025)</a>.
     </p>
 
     <p>
-      Not every sidewalk needs to be shaded — and this map doesn’t make that call. It’s meant as a practical tool to help planners,
+      Not every sidewalk needs to be shaded, and this map doesn’t make that call. It’s meant as a practical tool to help planners,
       designers, and communities explore where targeted shade provision might have the most impact.
     </p>
 
@@ -763,22 +765,22 @@
       <!-- Map Controls -->
       <div class="map-controls">
         <div class="control-panel">
-          <div class="control-title">Shade Availability Index</div>
+          <div class="control-title">Shade Availability Index (SAI)</div>
           <div class="legend-item">
             <div class="legend-color" style="background: #D9A441;"></div>
-            <span>Poor Shading (<0.5)</span>
+            <span>Poor Shading (<50%)</span>
           </div>
           <div class="legend-item">
             <div class="legend-color" style="background: #4FA3B6;"></div>
-            <span>Acceptable (<0.7)</span>
+            <span>Acceptable (50–70%)</span>
           </div>
           <div class="legend-item">
             <div class="legend-color" style="background: #95C11F;"></div>
-            <span>Very Good (<0.9)</span>
+            <span>Very Good (70–90%)</span>
           </div>
           <div class="legend-item">
             <div class="legend-color" style="background: #5B7026;"></div>
-            <span>Excellent (>0.9)</span>
+            <span>Excellent (≥90%)</span>
           </div>
         </div>
       </div>

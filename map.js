@@ -148,7 +148,7 @@ async function loadMapData() {
             <span style="display:inline-block;width:10px;height:10px;background:${color};border:1px solid #555;"></span>
             <span>Shade Quality: ${category}</span>
           </span><br>
-          Average Index: ${meanShade.toFixed(2)}<br>
+          Average Shade Availability: ${(meanShade * 100).toFixed(0)}%<br>
           ${segmentCount} sidewalk segments
         `, { 
           permanent: false, 
@@ -250,8 +250,8 @@ function showNeighborhoodOverview(buurtName, meanShade, segmentCount, coverage) 
         <span class="info-stat-value"><span style="display:inline-block;width:10px;height:10px;background:${color};border:1px solid #555;margin-right:6px;"></span>${category}</span>
       </div>
       <div class="info-stat">
-        <span class="info-stat-label">Average Index:</span>
-        <span class="info-stat-value">${meanShade.toFixed(2)}</span>
+        <span class="info-stat-label">Average Shade Availability:</span>
+        <span class="info-stat-value">${(meanShade*100).toFixed(0)}%</span>
       </div>
       <div class="info-stat">
         <span class="info-stat-label">Sidewalk Segments:</span>
@@ -308,7 +308,7 @@ function displayNeighborhoodDetails(buurtData, buurtName, meanShade, segmentCoun
           <span style="display:inline-block;width:10px;height:10px;background:${chip};border:1px solid #555;"></span>
           <span>Shade Category: ${category}</span>
         </span><br>
-        Index: ${shadeIndex?.toFixed(2) || 'N/A'}<br>
+        Shade Availability: ${shadeIndex != null ? (shadeIndex*100).toFixed(0) + '%' : 'N/A'}<br>
         ID: ${guid || 'N/A'}
       `, { 
         permanent: false, 
@@ -346,12 +346,12 @@ function displayNeighborhoodDetails(buurtData, buurtName, meanShade, segmentCoun
         <span class="info-stat-value">${sidewalksOnly.length}</span>
       </div>
       <div class="info-stat">
-        <span class="info-stat-label">Average Shade:</span>
-        <span class="info-stat-value">${avgShade.toFixed(2)}</span>
+        <span class="info-stat-label">Average Shade Availability:</span>
+        <span class="info-stat-value">${(avgShade*100).toFixed(0)}%</span>
       </div>
       <div class="info-stat">
         <span class="info-stat-label">Range:</span>
-        <span class="info-stat-value">${minShade.toFixed(2)} - ${maxShade.toFixed(2)}</span>
+        <span class="info-stat-value">${(minShade*100).toFixed(0)}% - ${(maxShade*100).toFixed(0)}%</span>
       </div>
       <div class="info-stat">
         <span class="info-stat-label">Excellent Coverage:</span>
