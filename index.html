@@ -152,6 +152,169 @@
       50% { transform: translateY(32px); }
     }
     
+    /* About Section */
+    .about-section {
+      background: #0a0a0a;
+      border-top: 1px solid #1f1f1f;
+      border-bottom: 1px solid #1f1f1f;
+      padding: 80px 60px;
+    }
+
+    .about-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .about-kicker {
+      color: #95C11F;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .about-title {
+      font-size: clamp(28px, 3.6vw, 40px);
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+      margin-bottom: 18px;
+      color: #ffffff;
+    }
+
+    .about-layout {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 24px;
+      align-items: start;
+      margin-top: 20px;
+    }
+
+    .about-lead {
+      color: #bdbdbd;
+      font-weight: 300;
+      font-size: 16px;
+      line-height: 1.8;
+      max-width: 900px;
+      margin-bottom: 36px;
+    }
+
+    .about-grid { display: none; }
+
+    .about-card {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid #252525;
+      padding: 20px;
+      transition: border-color 0.25s ease;
+    }
+
+    .about-card:hover {
+      border-color: #2f2f2f;
+    }
+
+    .about-card h3 {
+      font-size: 16px;
+      font-weight: 500;
+      color: #e6e6e6;
+      margin-bottom: 10px;
+    }
+
+    .about-card p, .about-card li {
+      color: #b0b0b0;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .about-card ul {
+      padding-left: 18px;
+    }
+
+    .about-visuals {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .about-right {
+      border-left: 1px solid #1f1f1f;
+      padding-left: 16px;
+    }
+
+    .preview {
+      position: relative;
+      background: radial-gradient(100% 100% at 0% 0%, #0f0f0f 0%, #0a0a0a 100%);
+      border: 1px solid #252525;
+      overflow: hidden;
+      display: block;
+    }
+
+    .preview img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .preview-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid #333333;
+      color: #cfcfcf;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 8px;
+    }
+
+    .preview-caption {
+      color: #8a8a8a;
+      font-size: 12px;
+      padding: 8px 10px 10px;
+      border-top: 1px solid #252525;
+    }
+
+    .about-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+    }
+
+    .about-note {
+      color: #8a8a8a;
+      font-size: 13px;
+      font-weight: 300;
+    }
+
+    .about-cta {
+      margin-left: auto;
+    }
+
+    .about-button {
+      color: #bdbdbd;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 300;
+      border: 1px solid #333333;
+      padding: 10px 16px;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      display: inline-block;
+    }
+
+    .about-button:hover { 
+      border-color: #95C11F; 
+      color: #95C11F; 
+    }
+
+    .about-section a { color: #95C11F; text-decoration: none; }
+    .about-section a:hover { text-decoration: underline; }
+    .about-resources { color: #8a8a8a; font-size: 13px; margin-top: 16px; }
+
     /* Map Section */
     .map-section {
       min-height: 100vh;
@@ -401,6 +564,8 @@
         padding-left: 40px;
         padding-right: 40px;
       }
+      .about-section { padding: 56px 40px; }
+      .about-layout { grid-template-columns: 1fr; gap: 18px; }
       
       .map-controls, .info-panel {
         right: 15px;
@@ -424,6 +589,9 @@
       .header-info {
         text-align: left;
       }
+      .about-section { padding: 40px 24px; }
+      .about-layout { grid-template-columns: 1fr; gap: 16px; }
+      .about-right { border-left: 0; padding-left: 0; }
       
       .map-header {
         flex-direction: column;
@@ -481,12 +649,87 @@
           </p>
       </main>
       
-      <div class="scroll-indicator" onclick="scrollToMap()">
+      <div class="scroll-indicator" onclick="scrollToAbout()">
         <div class="scroll-arrow"></div>
-        <span>Explore Data</span>
+        <span>Learn More</span>
       </div>
     </div>
   </section>
+
+  <!-- About / Context Section -->
+   <section class="about-section" id="about-section">
+  <div class="about-inner">
+    <div class="about-kicker">Context</div>
+    <h2 class="about-title">What the shade?</h2>
+    
+    <!-- <p class="about-lead"> -->
+    <p>
+      Shade is one of the simplest and most effective ways to reduce heat exposure in cities.
+      It’s what keeps a walk bearable on a hot day. But not all streets are created equal — and until now,
+      city planners haven’t had the tools to see where shade is missing, or how to provide it where it matters most.
+    </p>
+
+    <p>
+      Shade improves urban comfort by lowering <strong>Mean Radiant Temperature (MRT)</strong> — the key driver of how hot we feel.
+      Unlike air temperature, MRT can be directly shaped by urban design: trees, buildings, materials, and geometry.
+      In fact, research shows that reducing radiation exposure through shade is often more effective than lowering air temperature alone.
+    </p>
+    <br>
+
+    <p>
+      This map shows the <strong>Shade Availability Index (SAI)</strong>: a value between 0 and 1 indicating how much shade is available
+      on sidewalks during the day. It’s a method developed by Or Aleksandrowicz and adapted here for Amsterdam’s context.
+      While Israeli planning guidelines use a 50% minimum threshold, we apply the <strong>30% shade benchmark</strong> suggested by
+      recent research at the Amsterdam University of Applied Sciences (HvA), to better reflect local climate and sun angles.
+    </p>
+
+    <div class="about-layout">
+      <div class="about-card">
+        <h3>How to use the map</h3>
+        <ul>
+          <li>Start with the overview to compare neighborhoods.</li>
+          <li>Click a neighborhood to zoom to sidewalk detail.</li>
+          <li>Color scale: red = limited shade, yellow/green = better shade.</li>
+          <li>Read the summary to see % of sidewalks by shade level.</li>
+        </ul>
+      </div>
+
+      <div class="about-right">
+      <div class="about-visuals">
+        <div class="preview" aria-label="Overview map preview">
+          <span class="preview-badge">Overview</span>
+          <img src="data/overview_preview.svg" alt="Overview map preview">
+          <div class="preview-caption">Amsterdam neighborhoods colored by average sidewalk shade (SAI).</div>
+        </div>
+        <div class="preview" aria-label="Neighborhood detail preview">
+          <span class="preview-badge">Neighborhood</span>
+          <img src="data/neighborhood_preview.svg" alt="Neighborhood detail preview">
+          <div class="preview-caption">Example neighborhood segments colored by shade level.</div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <p class="about-resources">
+      Related resources: 
+      <a href="https://www.hva.nl/onderzoeksresultaten/2020/6/coolkit" target="_blank" rel="noopener">CoolKit</a>
+      and 
+      <a href="https://oraleks.net.technion.ac.il/files/2025/06/Aleksandrowicz-et-al.-Guidelines-for-Applying-Quantitative-Shade-Indicators.pdf" target="_blank" rel="noopener">Guidelines for Applying Quantitative Shade Indicators</a>.
+    </p>
+
+    <p>
+      Not every sidewalk needs to be shaded — and this map doesn’t make that call. It’s meant as a practical tool to help planners,
+      designers, and communities explore where targeted shade provision might have the most impact.
+    </p>
+
+    <div class="about-footer">
+      <div class="about-note">Built for action — not just analysis.</div>
+      <div class="about-cta">
+        <a class="about-button" href="#map-section">Continue to Map</a>
+      </div>
+    </div>
+  </div>
+</section>
 
   <!-- Map Section -->
   <section class="map-section" id="map-section">
@@ -505,30 +748,22 @@
       <!-- Map Controls -->
       <div class="map-controls">
         <div class="control-panel">
-          <div class="control-title">Shade Index Legend</div>
+          <div class="control-title">Shade Availability Index</div>
           <div class="legend-item">
             <div class="legend-color" style="background: #B71C1C;"></div>
-            <span>No shade (0.0)</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background: #FF5722;"></div>
-            <span>Low shade (0.2)</span>
+            <span>Poor Shading (<0.5)</span>
           </div>
           <div class="legend-item">
             <div class="legend-color" style="background: #FF9800;"></div>
-            <span>Moderate shade (0.4)</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background: #FFC107;"></div>
-            <span>Good shade (0.6)</span>
+            <span>Acceptable (<0.7)</span>
           </div>
           <div class="legend-item">
             <div class="legend-color" style="background: #95C11F;"></div>
-            <span>High shade (0.8)</span>
+            <span>Very Good (<0.9)</span>
           </div>
           <div class="legend-item">
             <div class="legend-color" style="background: #5B7026;"></div>
-            <span>Full shade (1.0)</span>
+            <span>Excellent (>0.9)</span>
           </div>
         </div>
       </div>
@@ -554,9 +789,9 @@
   <script src="map.js"></script>
   
   <script>
-    // Smooth scroll to map section
-    function scrollToMap() {
-      document.getElementById('map-section').scrollIntoView({ 
+    // Smooth scroll to about section
+    function scrollToAbout() {
+      document.getElementById('about-section').scrollIntoView({ 
         behavior: 'smooth',
         block: 'start'
       });
