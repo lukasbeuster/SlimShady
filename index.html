@@ -731,6 +731,81 @@
       }
       .text-panel { padding: 20px; max-width: 92vw; }
     }
+
+    /* City Selector - Elegant SCL Design */
+    .city-selector-container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .city-selector-label {
+      font-size: 13px;
+      color: #999999;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 500;
+    }
+
+    .city-selector {
+      position: relative;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid #333333;
+      border-radius: 4px;
+      padding: 10px 40px 10px 16px;
+      font-size: 15px;
+      font-weight: 500;
+      color: #95C11F;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      min-width: 160px;
+      transition: all 0.2s ease;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="%2395C11F" d="M6 8L2 4h8z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .city-selector:hover {
+      border-color: #95C11F;
+      background: rgba(149, 193, 31, 0.05);
+    }
+
+    .city-selector:focus {
+      outline: none;
+      border-color: #95C11F;
+      box-shadow: 0 0 0 2px rgba(149, 193, 31, 0.1);
+    }
+
+    .city-selector option {
+      background: #1a1a1a;
+      color: #ffffff;
+      padding: 10px;
+    }
+
+    /* City Context Badge */
+    .city-context {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: rgba(149, 193, 31, 0.08);
+      border: 1px solid rgba(149, 193, 31, 0.2);
+      border-radius: 16px;
+      font-size: 11px;
+      color: #95C11F;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 768px) {
+      .city-selector-label { display: none; }
+      .city-selector { min-width: 140px; font-size: 14px; }
+    }
+
   </style>
 </head>
 <body>
@@ -797,7 +872,7 @@
 
     <p>
       This map shows the <strong>Shade Availability Index (SAI)</strong>: the percentage of daytime intervals in which a sidewalk
-      segment is sufficiently shaded, above a city-specific threshold (typically 30–50%). For Amsterdam, we evaluate intervals
+      segment is sufficiently shaded, above a city-specific threshold (<span id="thresholdText">typically 30–50%</span>). <span id="cityAnalysisText">For Amsterdam, we evaluate intervals</span>
       between <strong>09:00 and 18:00</strong> on the summer solstice. We classify SAI into four categories tailored to planning use:
       <strong>Poor</strong> (< 50%), <strong>Acceptable</strong> (50–70%), <strong>Very good</strong> (70–90%), and <strong>Excellent</strong> (≥ 90%).
       The approach draws on the <em>Guidelines for Applying Quantitative Shade Indicators in Urban Planning in Israel</em>
@@ -820,7 +895,7 @@
           <div class="preview" aria-label="Overview map preview">
             <span class="preview-badge">Overview</span>
             <img src="data/overview_preview.svg" alt="Overview map preview">
-            <div class="preview-caption">Amsterdam neighborhoods colored by average sidewalk shade (SAI).</div>
+            <div class="preview-caption" id="previewCaption">Neighborhoods colored by average sidewalk shade (SAI).</div>
           </div>
           <div class="preview" aria-label="Neighborhood detail preview">
             <span class="preview-badge">Neighborhood</span>
@@ -858,9 +933,18 @@
       <div class="map-title">
         <span>(Slim) Shady</span>
         <span style="color: #666666;">|</span>
-        <span style="color: #95C11F; font-weight: 300;">Interactive Shade Analysis of Amsterdam</span>
+        <span style="color: #95C11F; font-weight: 300;" id="mapSubtitle">Interactive Shade Analysis</span>
       </div>
-      <a href="#hero" class="back-to-top">↑ Back to Top</a>
+      <div style="display: flex; align-items: center; gap: 24px;">
+        <div class="city-selector-container">
+          <span class="city-selector-label">City</span>
+          <select id="citySelector" class="city-selector">
+            <option value="amsterdam">Amsterdam</option>
+            <option value="capetown">Cape Town</option>
+          </select>
+        </div>
+        <a href="#hero" class="back-to-top">↑ Back to Top</a>
+      </div>
     </div>
     
     <div class="map-container">

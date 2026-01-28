@@ -1,0 +1,14 @@
+
+# Large ward detail files
+data/Ward_data/
+data/Buurt_data/
+
+# Backup files
+*.backup
+
+# Processing logs
+*.log
+
+# MIF/MID files
+*.mid
+*.mif

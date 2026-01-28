@@ -11,24 +11,147 @@ const SCL_COLORS = {
 // Shade categories with professional color mapping
 function getShadeColor(shadeIndex) {
   if (shadeIndex === undefined || shadeIndex === null) return '#666666';
-  if (shadeIndex < 0.5) return SCL_COLORS.gray;      // Poor (neutral gray)
-  if (shadeIndex < 0.7) return SCL_COLORS.teal;      // Acceptable (teal-blue)
-  if (shadeIndex < 0.9) return SCL_COLORS.green;     // Very Good (SCL green)
-  return SCL_COLORS.darkGreen;                        // Excellent (dark green)
+  const config = getCurrentConfig();
+  const scale = config.colorScale;
+  if (shadeIndex < scale.poor) return SCL_COLORS.gray;
+  if (shadeIndex < scale.acceptable) return SCL_COLORS.teal;
+  if (shadeIndex < scale.veryGood) return SCL_COLORS.green;
+  return SCL_COLORS.darkGreen;
+}
+
+
+// City Configuration
+const CITY_CONFIG = {
+  amsterdam: {
+    name: 'Amsterdam',
+    displayName: 'Amsterdam',
+    center: [52.3676, 4.9041],
+    zoom: 11,
+    bounds: [[52.25, 4.7], [52.45, 5.1]], // SW, NE corners
+    statsFile: 'data/neighborhoods_with_shade_stats.geojson',
+    sidewalksFile: 'data/sidewalks_web_minimal.geojson',
+    detailFolder: 'data/Buurt_data/',
+    detailFilePattern: '{id}_sidewalks.geojson',
+    idField: 'Buurtcode',
+    nameField: 'Buurt',
+    indexField: 'shade_availability_index_30',
+    threshold: 30,
+    unit: 'neighborhood',
+    unitPlural: 'neighborhoods',
+    description: 'For Amsterdam, we evaluate intervals',
+    colorScale: {
+      poor: 0.5,
+      acceptable: 0.7,
+      veryGood: 0.9
+    }
+  },
+  capetown: {
+    name: 'Cape Town',
+    displayName: 'Cape Town',
+    center: [-33.92, 18.42],
+    zoom: 11,
+    bounds: [[-34.16, 18.30], [-33.58, 18.83]], // SW, NE corners (lat, lng)
+    statsFile: 'data/wards_with_shade_stats.geojson',
+    sidewalksFile: 'data/capetown_sidewalks_web_minimal.geojson',
+    detailFolder: 'data/Ward_data/',
+    detailFilePattern: 'ward_{id}.geojson',
+    idField: 'WARD_NAME',
+    nameField: 'WARD_NAME',
+    indexField: 'shade_availability_index_50',
+    threshold: 50,
+    unit: 'ward',
+    unitPlural: 'wards',
+    description: 'For Cape Town, we evaluate intervals',
+    colorScale: {
+      poor: 0.3,
+      acceptable: 0.5,
+      veryGood: 0.7
+    }
+  }
+};
+
+let currentCity = 'amsterdam';
+
+function getCurrentConfig() {
+  return CITY_CONFIG[currentCity];
+}
+
+function switchCity(cityId) {
+  if (cityId === currentCity) return;
+  
+  console.log(`Switching from ${currentCity} to ${cityId}`);
+  currentCity = cityId;
+  const config = getCurrentConfig();
+  
+  // Update UI text
+  document.getElementById('mapSubtitle').textContent = `Interactive Shade Analysis`;
+  document.getElementById('thresholdText').textContent = `${config.threshold}%`;
+  document.getElementById('cityAnalysisText').textContent = config.description;
+  document.getElementById('previewCaption').textContent = 
+    `${config.displayName} ${config.unitPlural} colored by average sidewalk shade (SAI).`;
+  
+  // Clear existing layers completely
+  if (buurtenLayer) {
+    try {
+      map.removeLayer(buurtenLayer);
+    } catch (e) {
+      console.log('Layer already removed');
+    }
+    buurtenLayer = null;
+  }
+  if (currentBuurtLayer) {
+    try {
+      map.removeLayer(currentBuurtLayer);
+    } catch (e) {
+      console.log('Detail layer already removed');
+    }
+    currentBuurtLayer = null;
+  }
+  loadedBuurten.clear();
+  isDetailView = false;
+  hideInfoPanel();
+  
+  // Clear all event listeners from old layers
+  map.eachLayer((layer) => {
+    if (layer.feature) {
+      layer.off();
+    }
+  });
+  
+  // Show loading during switch
+  showLoading();
+  
+  // Clear max bounds to allow navigation to new city
+  map.setMaxBounds(null);
+  
+  // Re-center map to approximate location
+  // The data loading will fit to actual bounds
+  // Use stored bounds if switching back, otherwise use config center
+  if (window.currentCityBounds) {
+    // Just clear and let loadMapData handle the fitting
+    map.setView(config.center, 10, { animate: false });
+  } else {
+    map.setView(config.center, 10, { animate: false });
+  }
+  
+  // Reload data immediately (will fit to actual bounds)
+  loadMapData();
 }
 
 // Get shade category label
 function getShadeCategory(shadeIndex) {
   if (shadeIndex === undefined || shadeIndex === null) return 'Unknown';
-  if (shadeIndex < 0.5) return 'Poor Shading';
-  if (shadeIndex < 0.7) return 'Acceptable';
-  if (shadeIndex < 0.9) return 'Very Good';
+  const config = getCurrentConfig();
+  const scale = config.colorScale;
+  if (shadeIndex < scale.poor) return 'Poor Shading';
+  if (shadeIndex < scale.acceptable) return 'Acceptable';
+  if (shadeIndex < scale.veryGood) return 'Very Good';
   return 'Excellent';
 }
 
 // Global variables
 let map = null;
-let buurtenLayer = null;
+let buurtenLayer = null; // Generic layer for neighborhoods/wards
 let currentBuurtLayer = null;
 let loadedBuurten = new Map();
 let mapInitialized = false;
@@ -48,12 +171,17 @@ function initializeMap() {
     return;
   }
   
+  const config = getCurrentConfig();
   map = L.map('map', {
     zoomControl: false,
     minZoom: 10,
     maxZoom: 19,
-    scrollWheelZoom: false // disable to allow page scroll past the map
-  }).setView([52.3676, 4.9041], 11);
+    scrollWheelZoom: false, // disable to allow page scroll past the map
+    preferCanvas: false, // Use SVG rendering (better for data layers)
+    zoomAnimation: true,
+    fadeAnimation: true,
+    markerZoomAnimation: true
+  }).setView(config.center, config.zoom);
 
   // Add zoom control in bottom right
   L.control.zoom({
@@ -70,8 +198,7 @@ function initializeMap() {
   mapInitialized = true;
   loadMapData();
 
-  // Friendly scroll/zoom behavior: page scroll by default, Ctrl+wheel to zoom
-  setupWheelZoomHint();
+  // Wheel zoom hint will be set up after function definitions
 }
 
 // Loading functions
@@ -86,7 +213,7 @@ function hideLoading() {
 // Info panel functions
 function showInfoPanel(title, content) {
   const titleElement = document.querySelector('#infoPanel .info-title');
-  const contentElement = document.getElementById('buurtInfo');
+  const contentElement = document.getElementById('buurtInfo'); // Generic info container
   if (titleElement) titleElement.textContent = title;
   if (contentElement) contentElement.innerHTML = content;
   document.getElementById('infoPanel').classList.add('active');
@@ -98,7 +225,8 @@ function hideInfoPanel() {
 
 // Style neighborhoods based on average shade
 function styleNeighborhoods(feature) {
-  const meanShade = feature.properties.shade_availability_index_30_mean || 0;
+  const config = getCurrentConfig();
+  const meanShade = feature.properties[`${config.indexField}_mean`] || 0;
   const color = getShadeColor(meanShade);
   
   return {
@@ -112,7 +240,8 @@ function styleNeighborhoods(feature) {
 
 // Style detailed sidewalks
 function styleDetailedSidewalks(feature) {
-  const shadeIndex = feature.properties.shade_availability_index_30;
+  const config = getCurrentConfig();
+  const shadeIndex = feature.properties[config.indexField];
   
   return {
     color: getShadeColor(shadeIndex),
@@ -128,9 +257,10 @@ async function loadMapData() {
   showLoading();
   
   try {
-    console.log('Loading neighborhood data with shade statistics...');
-  console.log("mapInitialized:", mapInitialized, "map object:", !!map);
-    const response = await fetch('data/neighborhoods_with_shade_stats.geojson');
+    const config = getCurrentConfig();
+    console.log(`Loading ${config.unit} data for ${config.name}...`);
+    console.log("mapInitialized:", mapInitialized, "map object:", !!map);
+    const response = await fetch(config.statsFile);
     const buurtenData = await response.json();
     
     console.log('Neighborhood data loaded:', buurtenData.features.length, 'features');
@@ -138,17 +268,18 @@ async function loadMapData() {
     buurtenLayer = L.geoJSON(buurtenData, {
       style: styleNeighborhoods,
       onEachFeature: (feature, layer) => {
+        const config = getCurrentConfig();
         const props = feature.properties;
-        const buurtName = props.Buurt || 'Unknown';
-        const buurtCode = props.Buurtcode || props.CBS_Buurtcode || 'N/A';
-        const meanShade = props.shade_availability_index_30_mean || 0;
-        const segmentCount = props.shade_availability_index_30_count || 0;
+        const areaName = props[config.nameField] || 'Unknown';
+        const buurtCode = props[config.idField] || props.CBS_Buurtcode || 'N/A';
+        const meanShade = props[`${config.indexField}_mean`] || 0;
+        const segmentCount = props[`${config.indexField}_count`] || 0;
         const coverage = props.coverage_excellent || 0;
         const category = getShadeCategory(meanShade);
         const color = getShadeColor(meanShade);
 
         layer.bindTooltip(`
-          <strong>${buurtName}</strong><br>
+          <strong>${config.name === 'Cape Town' ? 'Ward ' + areaName : areaName}</strong><br>
           <span style="display:inline-flex;align-items:center;gap:6px;">
             <span style="display:inline-block;width:10px;height:10px;background:${color};border:1px solid #555;"></span>
             <span>Shade Quality: ${category}</span>
@@ -172,21 +303,43 @@ async function loadMapData() {
         });
 
         layer.on('click', (e) => {
-          loadNeighborhoodDetails(buurtCode, buurtName, meanShade, segmentCount, coverage, e.target);
+          loadNeighborhoodDetails(buurtCode, areaName, meanShade, segmentCount, coverage, e.target);
         });
       }
     }).addTo(map);
     
     // Set map bounds
-    map.fitBounds(buurtenLayer.getBounds(), { padding: [20, 20] });
-    map.setMaxBounds(buurtenLayer.getBounds().pad(0.1));
+    const bounds = buurtenLayer.getBounds();
+    console.log('Data bounds:', bounds);
+    
+    // Store the overview bounds for this city
+    window.currentCityBounds = bounds;
+    
+    // Fit to data with padding, but ensure reasonable zoom
+    map.fitBounds(bounds, { 
+      padding: [20, 20],
+      maxZoom: 12  // Allow appropriate zoom level
+    });
+    
+    // Set max bounds to prevent excessive zooming out
+    // Use configured bounds to allow proper viewing of the city
+    if (config.bounds) {
+      map.setMaxBounds(config.bounds);
+    } else {
+      map.setMaxBounds(bounds.pad(0.5));
+    }
     
     console.log('Map initialization complete');
     
   } catch (error) {
     console.error('Error loading map data:', error);
   } finally {
-  hideLoading();
+    hideLoading();
+    // Show city overview after loading
+    if (!isDetailView) {
+      showCityOverview();
+    }
+  }
 }
 
 // Build popup HTML for a sidewalk feature
@@ -283,49 +436,52 @@ function setupWheelZoomHint() {
     }
   }, { passive: false });
 }
-}
 
 // Load detailed neighborhood data with filtering
-async function loadNeighborhoodDetails(buurtCode, buurtName, meanShade, segmentCount, coverage, buurtLayer) {
+async function loadNeighborhoodDetails(areaCode, areaName, meanShade, segmentCount, coverage, areaLayer) {
   showLoading();
   
   try {
     // Check cache first
-    if (loadedBuurten.has(buurtCode)) {
-      console.log('Using cached data for', buurtCode);
-      displayNeighborhoodDetails(loadedBuurten.get(buurtCode), buurtName, meanShade, segmentCount, coverage, buurtLayer);
+    if (loadedBuurten.has(areaCode)) {
+      console.log('Using cached data for', areaCode);
+      const cachedData = loadedBuurten.get(areaCode);
+      displayNeighborhoodDetails(cachedData, areaName, meanShade, segmentCount, coverage, areaLayer);
       return;
     }
     
-    console.log('Loading detailed data for neighborhood:', buurtCode);
-    const response = await fetch(`data/Buurt_data/${buurtCode}_sidewalks.geojson`);
+    console.log('Loading detailed data for area:', areaCode);
+    const config = getCurrentConfig();
+    const filename = config.detailFilePattern.replace('{id}', areaCode);
+    const response = await fetch(`${config.detailFolder}${filename}`);
     
     if (!response.ok) {
-      showNeighborhoodOverview(buurtName, meanShade, segmentCount, coverage);
+      showNeighborhoodOverview(areaName, meanShade, segmentCount, coverage);
       return;
     }
     
     const detailedData = await response.json();
-    console.log(`Loaded ${detailedData.features.length} detailed features for ${buurtName}`);
+    console.log(`Loaded ${detailedData.features.length} detailed features for ${areaName}`);
     
     // Cache the data
-    loadedBuurten.set(buurtCode, detailedData);
+    loadedBuurten.set(areaCode, detailedData);
     
-    displayNeighborhoodDetails(detailedData, buurtName, meanShade, segmentCount, coverage, buurtLayer);
+    displayNeighborhoodDetails(detailedData, areaName, meanShade, segmentCount, coverage, areaLayer);
     
   } catch (error) {
     console.error('Error loading neighborhood details:', error);
-    showNeighborhoodOverview(buurtName, meanShade, segmentCount, coverage);
+    showNeighborhoodOverview(areaName, meanShade, segmentCount, coverage);
   } finally {
     hideLoading();
   }
 }
 
 // Show neighborhood overview when no detailed data available
-function showNeighborhoodOverview(buurtName, meanShade, segmentCount, coverage) {
+function showNeighborhoodOverview(areaName, meanShade, segmentCount, coverage) {
   const category = getShadeCategory(meanShade);
+  const color = getShadeColor(meanShade);
   
-  showInfoPanel(buurtName, `
+  showInfoPanel((config.name === 'Cape Town' ? 'Ward ' + areaName : areaName), `
     <div style="margin-bottom: 16px;">
       <div class="info-stat">
         <span class="info-stat-label">Shade Quality:</span>
@@ -351,7 +507,7 @@ function showNeighborhoodOverview(buurtName, meanShade, segmentCount, coverage) 
 }
 
 // Display detailed neighborhood analysis with sidewalk filtering
-function displayNeighborhoodDetails(buurtData, buurtName, meanShade, segmentCount, coverage, buurtLayer) {
+function displayNeighborhoodDetails(buurtData, areaName, meanShade, segmentCount, coverage, areaLayer) {
   // Switch to detail view
   isDetailView = true;
   activeSidewalkLayer = null;
@@ -369,10 +525,16 @@ function displayNeighborhoodDetails(buurtData, buurtName, meanShade, segmentCoun
     map.removeLayer(currentBuurtLayer);
   }
   
-  // Filter only sidewalks from the detailed data
-  const sidewalksOnly = buurtData.features.filter(feature => 
-    feature.properties.Gebruiksfunctie === 'Sidewalk'
-  );
+  // Filter only sidewalks from the detailed data (if Gebruiksfunctie exists)
+  const config = getCurrentConfig();
+  const sidewalksOnly = buurtData.features.filter(feature => {
+    // Amsterdam has Gebruiksfunctie field to filter
+    if (feature.properties.Gebruiksfunctie) {
+      return feature.properties.Gebruiksfunctie === 'Sidewalk';
+    }
+    // Cape Town - all features are sidewalks
+    return true;
+  });
   
   const sidewalkGeoJSON = {
     type: 'FeatureCollection',
@@ -383,19 +545,25 @@ function displayNeighborhoodDetails(buurtData, buurtName, meanShade, segmentCoun
   currentBuurtLayer = L.geoJSON(sidewalkGeoJSON, {
     style: styleDetailedSidewalks,
     onEachFeature: (feature, layer) => {
-      const shadeIndex = feature.properties.shade_availability_index_30;
+      const config = getCurrentConfig();
+  const shadeIndex = feature.properties[config.indexField];
       const guid = feature.properties.Guid;
       const category = getShadeCategory(shadeIndex);
       const chip = getShadeColor(shadeIndex);
       
       // Inline rich tooltip (no click needed)
-      const yrBuilt = (feature.properties.Jaar_van_aanleg ?? '—');
+      // Amsterdam-specific fields (may not exist for other cities)
+      const yrBuilt = (feature.properties.Jaar_van_aanleg ?? feature.properties.year_built ?? '—');
       const yrConserve = (feature.properties.Jaar_laatste_conservering ?? '—');
       const yrMaint = (feature.properties.Jaar_uitgevoerd_onderhoud ?? '—');
       const p1000 = feature.properties.shade_percent_at_1000;
       const p1300 = feature.properties.shade_percent_at_1300;
       const p1530 = feature.properties.shade_percent_at_1530;
       const p1800 = feature.properties.shade_percent_at_1800;
+      
+      // Only show detailed fields if they exist
+      const hasDetailFields = yrBuilt !== '—' || yrConserve !== '—' || yrMaint !== '—';
+      const hasTimeFields = p1000 != null || p1300 != null || p1530 != null || p1800 != null;
       const bar = (p) => `<span style=\"display:inline-block;height:6px;width:40px;background:${getShadeColor((p||0)/100)};opacity:0.9;\"></span>`;
       const tipHtml = `
         <div style="min-width:240px;">
@@ -429,8 +597,8 @@ function displayNeighborhoodDetails(buurtData, buurtName, meanShade, segmentCoun
   }).addTo(map);
   currentBuurtLayer.bringToFront();
   
-  // Zoom to neighborhood
-  map.fitBounds(buurtLayer.getBounds(), { padding: [50, 50] });
+  // Zoom to detail area
+  map.fitBounds(areaLayer.getBounds(), { padding: [50, 50] });
 
   // Calculate statistics for sidewalks only
   const sidewalkShadeValues = sidewalksOnly
@@ -449,7 +617,7 @@ function displayNeighborhoodDetails(buurtData, buurtName, meanShade, segmentCoun
   const excellentCount = sidewalkShadeValues.filter(val => val >= 0.9).length;
   const excellentPercentage = sidewalkShadeValues.length > 0 ? (excellentCount / sidewalkShadeValues.length * 100) : 0;
   
-  showInfoPanel(buurtName + ' - Detail View', `
+  showInfoPanel((config.name === 'Cape Town' ? 'Ward ' + areaName : areaName) + ' - Detail View', `
     <div style="margin-bottom: 16px;">
       <div class="info-stat">
         <span class="info-stat-label">Sidewalk Segments:</span>
@@ -509,6 +677,69 @@ function displayNeighborhoodDetails(buurtData, buurtName, meanShade, segmentCoun
 }
 
 // Return to overview mode
+
+// Show city-level overview information
+function showCityOverview() {
+  const config = getCurrentConfig();
+  
+  // Calculate city-wide statistics
+  let totalAreas = 0;
+  let totalSegments = 0;
+  let avgShade = 0;
+  let excellentCount = 0;
+  
+  if (buurtenLayer) {
+    buurtenLayer.eachLayer((layer) => {
+      const props = layer.feature.properties;
+      const meanShade = props[`${config.indexField}_mean`] || 0;
+      const segmentCount = props[`${config.indexField}_count`] || 0;
+      
+      totalAreas++;
+      totalSegments += segmentCount;
+      avgShade += meanShade;
+      
+      if (meanShade >= 0.75) excellentCount++;
+    });
+    
+    avgShade = totalAreas > 0 ? avgShade / totalAreas : 0;
+    const excellentPercentage = totalAreas > 0 ? (excellentCount / totalAreas * 100) : 0;
+    
+    const category = getShadeCategory(avgShade);
+    const color = getShadeColor(avgShade);
+    
+    showInfoPanel(`${config.displayName} Overview`, `
+      <div style="margin-bottom: 16px;">
+        <div class="info-stat">
+          <span class="info-stat-label">${config.unitPlural.charAt(0).toUpperCase() + config.unitPlural.slice(1)}:</span>
+          <span class="info-stat-value">${totalAreas}</span>
+        </div>
+        <div class="info-stat">
+          <span class="info-stat-label">Sidewalk Segments:</span>
+          <span class="info-stat-value">${totalSegments.toLocaleString()}</span>
+        </div>
+        <div class="info-stat">
+          <span class="info-stat-label">City-wide Average:</span>
+          <span class="info-stat-value">
+            <span style="display:inline-block;width:10px;height:10px;background:${color};border:1px solid #555;margin-right:6px;"></span>
+            ${(avgShade*100).toFixed(0)}% (${category})
+          </span>
+        </div>
+        <div class="info-stat">
+          <span class="info-stat-label">Excellent ${config.unitPlural}:</span>
+          <span class="info-stat-value">${excellentCount} (${excellentPercentage.toFixed(0)}%)</span>
+        </div>
+        <div class="info-stat">
+          <span class="info-stat-label">Shade Threshold:</span>
+          <span class="info-stat-value">${config.threshold}%</span>
+        </div>
+      </div>
+      <div style="font-size: 12px; color: #888; margin-top: 12px; padding-top: 12px; border-top: 1px solid #333;">
+        Click any ${config.unit} to view detailed sidewalk data
+      </div>
+    `);
+  }
+}
+
 function returnToOverview() {
   isDetailView = false;
   
@@ -535,7 +766,7 @@ function returnToOverview() {
     map.fitBounds(cityBounds, { padding: [20, 20], maxZoom: 12, animate: true });
   }
   
-  hideInfoPanel();
+  showCityOverview();
 }
 
 // Check if map section is visible and initialize
@@ -575,3 +806,19 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 console.log('SlimShady map loaded - clean and minimal version');
+
+
+// City selector event listener
+document.addEventListener('DOMContentLoaded', () => {
+  const selector = document.getElementById('citySelector');
+  if (selector) {
+    selector.addEventListener('change', (e) => {
+      switchCity(e.target.value);
+    });
+  }
+  
+  // Set up wheel zoom hint after everything is loaded
+  if (typeof setupWheelZoomHint === 'function') {
+    setupWheelZoomHint();
+  }
+});
