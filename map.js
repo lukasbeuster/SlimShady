@@ -602,7 +602,7 @@ function displayNeighborhoodDetails(buurtData, areaName, meanShade, segmentCount
 
   // Calculate statistics for sidewalks only
   const sidewalkShadeValues = sidewalksOnly
-    .map(f => f.properties.shade_availability_index_30)
+    .map(f => f.properties[config.indexField])
     .filter(val => val !== null && val !== undefined);
   
   const avgShade = sidewalkShadeValues.length > 0 ? 
@@ -611,10 +611,10 @@ function displayNeighborhoodDetails(buurtData, areaName, meanShade, segmentCount
   const minShade = sidewalkShadeValues.length > 0 ? Math.min(...sidewalkShadeValues) : 0;
   
   // Category counts
-  const poorCount = sidewalkShadeValues.filter(val => val < 0.5).length;
-  const acceptableCount = sidewalkShadeValues.filter(val => val >= 0.5 && val < 0.7).length;
-  const veryGoodCount = sidewalkShadeValues.filter(val => val >= 0.7 && val < 0.9).length;
-  const excellentCount = sidewalkShadeValues.filter(val => val >= 0.9).length;
+  const poorCount = sidewalkShadeValues.filter(val => val < config.colorScale.poor).length;
+  const acceptableCount = sidewalkShadeValues.filter(val => val >= config.colorScale.poor && val < config.colorScale.acceptable).length;
+  const veryGoodCount = sidewalkShadeValues.filter(val => val >= config.colorScale.acceptable && val < config.colorScale.veryGood).length;
+  const excellentCount = sidewalkShadeValues.filter(val => val >= config.colorScale.veryGood).length;
   const excellentPercentage = sidewalkShadeValues.length > 0 ? (excellentCount / sidewalkShadeValues.length * 100) : 0;
   
   showInfoPanel((config.name === 'Cape Town' ? 'Ward ' + areaName : areaName) + ' - Detail View', `
