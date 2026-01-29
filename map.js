@@ -136,6 +136,9 @@ function switchCity(cityId) {
   
   // Reload data immediately (will fit to actual bounds)
   loadMapData();
+  
+  // Check if data quality notice should be shown
+  setTimeout(checkAndShowNotice, 100);
 }
 
 // Get shade category label
@@ -808,6 +811,46 @@ document.addEventListener('DOMContentLoaded', () => {
 console.log('SlimShady map loaded - clean and minimal version');
 
 
+
+// Data quality notice handling
+function dismissNotice() {
+  const notice = document.getElementById('dataQualityNotice');
+  if (notice) {
+    notice.classList.remove('visible');
+    sessionStorage.setItem('noticeD ismissed', 'true');
+  }
+}
+
+function showDataQualityModal() {
+  alert(`Data Quality Comparison:
+
+Amsterdam:
+• Derived from AHN (Actueel Hoogtebestand Nederland) LiDAR data
+• High-resolution 3D point cloud (8-10 points/m²)
+• Authoritative municipal sidewalk dataset
+• Superior tree detection and canopy segmentation accuracy
+
+Cape Town:
+• Derived from Google Solar API
+• Lower spatial resolution
+• Sidewalk polygons estimated from OpenStreetMap graph networks
+• Experimental data with reduced accuracy in tree detection
+
+Interpretation:
+Cape Town results are preliminary research outputs. Direct comparison between cities should account for these methodological differences.`);
+}
+
+function checkAndShowNotice() {
+  const notice = document.getElementById('dataQualityNotice');
+  const dismissed = sessionStorage.getItem('noticeDismissed');
+  
+  if (notice && currentCity === 'capetown' && dismissed !== 'true') {
+    notice.classList.add('visible');
+  } else if (notice) {
+    notice.classList.remove('visible');
+  }
+}
+
 // City selector event listener
 document.addEventListener('DOMContentLoaded', () => {
   const selector = document.getElementById('citySelector');
@@ -816,6 +859,9 @@ document.addEventListener('DOMContentLoaded', () => {
       switchCity(e.target.value);
     });
   }
+  
+  // Check data quality notice on initial load
+  checkAndShowNotice();
   
   // Set up wheel zoom hint after everything is loaded
   if (typeof setupWheelZoomHint === 'function') {

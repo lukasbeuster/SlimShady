@@ -806,6 +806,71 @@
       .city-selector { min-width: 140px; font-size: 14px; }
     }
 
+
+    /* Data Quality Notice Banner */
+    .data-notice {
+      background: linear-gradient(135deg, #FFF3CD 0%, #FFF8E1 100%);
+      border-left: 4px solid #FFA000;
+      color: #664D03;
+      padding: 14px 20px;
+      margin-bottom: 0;
+      font-size: 13px;
+      line-height: 1.6;
+      display: none;
+      position: relative;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .data-notice.visible {
+      display: block;
+    }
+
+    .data-notice-icon {
+      display: inline-block;
+      font-weight: bold;
+      margin-right: 8px;
+      font-size: 16px;
+    }
+
+    .data-notice-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .data-notice-text {
+      margin: 4px 0;
+    }
+
+    .data-notice-link {
+      color: #CC8000;
+      text-decoration: underline;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .data-notice-link:hover {
+      color: #996000;
+    }
+
+    .data-notice-close {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: #664D03;
+      cursor: pointer;
+      padding: 0;
+      width: 24px;
+      height: 24px;
+      line-height: 20px;
+      opacity: 0.6;
+    }
+
+    .data-notice-close:hover {
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
@@ -940,14 +1005,28 @@
           <span class="city-selector-label">City</span>
           <select id="citySelector" class="city-selector">
             <option value="amsterdam">Amsterdam</option>
-            <option value="capetown">Cape Town</option>
+            <option value="capetown">Cape Town (Experimental)</option>
           </select>
         </div>
         <a href="#hero" class="back-to-top">↑ Back to Top</a>
       </div>
     </div>
     
-    <div class="map-container">
+    <!-- Data Quality Notice Banner (shown for Cape Town) -->
+    <div id="dataQualityNotice" class="data-notice">
+      <button class="data-notice-close" onclick="dismissNotice()" aria-label="Dismiss">×</button>
+      <div>
+        <span class="data-notice-icon">ℹ️</span>
+        <span class="data-notice-title">Experimental Data</span>
+      </div>
+      <div class="data-notice-text">
+        Cape Town analysis uses preliminary data from non-authoritative sources. 
+        Results should be interpreted with caution. 
+        <a class="data-notice-link" onclick="showDataQualityModal()">Learn more about data quality</a>
+      </div>
+    </div>
+
+        <div class="map-container">
       <div id="map"></div>
       
       <!-- Map Controls -->

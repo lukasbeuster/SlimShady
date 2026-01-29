@@ -35,3 +35,21 @@ Optimized for GitHub Pages deployment with:
 - **Mapping**: Leaflet.js with coordinate transformation (Proj4)
 - **Data Format**: GeoJSON with Dutch RD → WGS84 transformation
 - **Performance**: Geometry simplification and strategic data sampling
+
+
+## Data Quality Notice
+
+### Amsterdam
+- **Source**: Actueel Hoogtebestand Nederland (AHN) LiDAR data
+- **Resolution**: High-resolution 3D point cloud (8-10 points/m²)
+- **Sidewalks**: Authoritative municipal dataset
+- **Accuracy**: High confidence in tree detection and canopy segmentation
+
+### Cape Town (Experimental)
+- **Source**: Google Solar API
+- **Resolution**: Lower spatial resolution
+- **Sidewalks**: Derived from OpenStreetMap graph networks (non-authoritative)
+- **Accuracy**: Reduced accuracy in tree detection and segmentation
+- **Status**: Preliminary research data - interpret with caution
+
+Direct comparison between cities should account for these methodological differences.
