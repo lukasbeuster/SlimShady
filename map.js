@@ -826,17 +826,16 @@ function showDataQualityModal() {
 
 Amsterdam:
 • Derived from AHN (Actueel Hoogtebestand Nederland) LiDAR data
-• High-resolution 3D point cloud (8-10 points/m²)
+• High-resolution 3D point cloud (10-14 points/m²)
 • Authoritative municipal sidewalk dataset
 • Superior tree detection and canopy segmentation accuracy
 
 Cape Town:
 • Derived from Google Solar API
-• Lower spatial resolution
+• Lower spatial resolution DSM (0.5m)
 • Sidewalk polygons estimated from OpenStreetMap graph networks
 • Experimental data with reduced accuracy in tree detection
 
-Interpretation:
 Cape Town results are preliminary research outputs. Direct comparison between cities should account for these methodological differences.`);
 }
 

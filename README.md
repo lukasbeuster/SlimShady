@@ -22,13 +22,6 @@ Interactive web map visualizing sidewalk shade availability across Amsterdam nei
 - **Neighborhood Data**: 512 detailed buurt files with full attributes
 - **Shade Index**: Values from 0.0 (no shade) to 1.0 (full shade)
 
-## 🚀 Deployment
-
-Optimized for GitHub Pages deployment with:
-- Fast loading times (< 1MB main dataset)
-- On-demand neighborhood data loading
-- Responsive design for all devices
-
 ## 🔧 Technical Details
 
 - **Frontend**: Vanilla HTML/CSS/JavaScript
