@@ -45,6 +45,32 @@ const CITY_CONFIG = {
       veryGood: 0.9
     }
   },
+  amsterdam_groenestraten: {
+    name: 'Amsterdam',
+    displayName: 'Amsterdam - Groene Straten (Gebieden)',
+    center: [52.3676, 4.9041],
+    zoom: 11,
+    bounds: [[52.25, 4.7], [52.45, 5.1]],
+    statsFile: 'data/groene_straten_with_shade_stats.geojson',
+    linesFile: 'data/groene_straten_lines.geojson',
+    sidewalksFile: '',
+    detailFolder: 'data/GroeneStraat_data/',
+    detailFilePattern: 'groene_straat_{id}.geojson',
+    idField: 'unit_id',
+    nameField: 'unit_name',
+    indexField: 'shade_availability_index_30',
+    threshold: 30,
+    unit: 'gebied',
+    unitPlural: 'gebieden',
+    description: 'For Amsterdam Groene Straten, we evaluate sidewalks intersecting a 15m street-canyon buffer.',
+    overviewCaption: 'Amsterdam gebieden colored by average sidewalk shade for sidewalks intersecting the Groene Straten 15m buffer.',
+    detailHint: 'Click any gebied to inspect full sidewalk segments intersecting the Groene Straten buffer.',
+    colorScale: {
+      poor: 0.5,
+      acceptable: 0.7,
+      veryGood: 0.9
+    }
+  },
   capetown: {
     name: 'Cape Town',
     displayName: 'Cape Town',
@@ -71,9 +97,145 @@ const CITY_CONFIG = {
 };
 
 let currentCity = 'amsterdam';
+let corridorHighlightMode = 'none';
+let corridorHighlightPercent = 10;
+let detailHighlightThresholds = { worst: null, best: null };
+let detailShadeValues = [];
+let groeneStratenLineLayer = null;
+let groeneStratenLineData = null;
 
 function getCurrentConfig() {
   return CITY_CONFIG[currentCity];
+}
+
+function isGreenStreetsView() {
+  return currentCity === 'amsterdam_groenestraten';
+}
+
+function formatAreaDisplayName(areaName, config = getCurrentConfig()) {
+  if (config.name === 'Cape Town') return `Ward ${areaName}`;
+  return areaName;
+}
+
+function getMeanShade(props, config = getCurrentConfig()) {
+  const rawValue = props?.[`${config.indexField}_mean`];
+  if (rawValue === null || rawValue === undefined) return null;
+  const parsed = Number(rawValue);
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
+function getSegmentCount(props, config = getCurrentConfig()) {
+  const rawValue = props?.[`${config.indexField}_count`];
+  if (rawValue === null || rawValue === undefined) return 0;
+  const parsed = Number(rawValue);
+  return Number.isNaN(parsed) ? 0 : parsed;
+}
+
+function getPercentileThresholds(values, percentile) {
+  if (!values || values.length === 0) return { worst: null, best: null };
+  const sorted = [...values].sort((a, b) => a - b);
+  const clamped = Math.min(Math.max(percentile, 1), 49) / 100;
+  const lowPos = (sorted.length - 1) * clamped;
+  const highPos = (sorted.length - 1) * (1 - clamped);
+  const interpolate = (arr, pos) => {
+    const lo = Math.floor(pos);
+    const hi = Math.ceil(pos);
+    if (lo === hi) return arr[lo];
+    const weight = pos - lo;
+    return arr[lo] + (arr[hi] - arr[lo]) * weight;
+  };
+  return {
+    worst: interpolate(sorted, lowPos),
+    best: interpolate(sorted, highPos)
+  };
+}
+
+function updateDetailHighlightThresholds() {
+  detailHighlightThresholds = getPercentileThresholds(detailShadeValues, corridorHighlightPercent);
+}
+
+function isSidewalkHighlighted(shadeIndex) {
+  if (!isDetailView || corridorHighlightMode === 'none') return true;
+  if (shadeIndex === null || shadeIndex === undefined) return false;
+  const worst = detailHighlightThresholds.worst;
+  const best = detailHighlightThresholds.best;
+  const isWorst = worst !== null && shadeIndex <= worst;
+  const isBest = best !== null && shadeIndex >= best;
+  if (corridorHighlightMode === 'worst') return isWorst;
+  if (corridorHighlightMode === 'best') return isBest;
+  if (corridorHighlightMode === 'both') return isWorst || isBest;
+  return true;
+}
+
+function applyDetailSidewalkStyling() {
+  if (!currentBuurtLayer || !isDetailView) return;
+  updateDetailHighlightThresholds();
+  currentBuurtLayer.setStyle((feature) => styleDetailedSidewalks(feature));
+  currentBuurtLayer.bringToFront();
+}
+
+function getGroeneLinePaneName() {
+  const paneName = 'groeneLinePane';
+  if (!map) return paneName;
+  let pane = map.getPane(paneName);
+  if (!pane) {
+    pane = map.createPane(paneName);
+    pane.style.zIndex = '390'; // keep beneath active sidewalk overlays
+    pane.style.pointerEvents = 'none';
+  }
+  return paneName;
+}
+
+function removeGroeneStratenLineLayer() {
+  if (!map || !groeneStratenLineLayer) return;
+  try {
+    map.removeLayer(groeneStratenLineLayer);
+  } catch (e) {
+    console.log('Groene straten line layer already removed');
+  }
+  groeneStratenLineLayer = null;
+}
+
+async function ensureGroeneStratenLineLayer() {
+  if (!isGreenStreetsView() || !map) {
+    removeGroeneStratenLineLayer();
+    return;
+  }
+  const config = getCurrentConfig();
+  if (!config.linesFile) return;
+
+  if (!groeneStratenLineData) {
+    try {
+      const response = await fetch(config.linesFile);
+      if (!response.ok) return;
+      groeneStratenLineData = await response.json();
+    } catch (error) {
+      console.error('Error loading Groene Straten lines:', error);
+      return;
+    }
+  }
+
+  if (!groeneStratenLineLayer) {
+    groeneStratenLineLayer = L.geoJSON(groeneStratenLineData, {
+      pane: getGroeneLinePaneName(),
+      style: {
+        color: '#F06BA8',
+        weight: 1.2,
+        opacity: 0.75,
+        dashArray: '6 10',
+        lineCap: 'round',
+        lineJoin: 'round'
+      },
+      interactive: false
+    }).addTo(map);
+  }
+  groeneStratenLineLayer.bringToFront();
+}
+
+function updateCorridorControlsVisibility() {
+  const panel = document.getElementById('corridorFocusPanel');
+  if (!panel) return;
+  panel.style.display = isGreenStreetsView() ? 'block' : 'none';
 }
 
 function switchCity(cityId) {
@@ -87,8 +249,9 @@ function switchCity(cityId) {
   document.getElementById('mapSubtitle').textContent = `Interactive Shade Analysis`;
   document.getElementById('thresholdText').textContent = `${config.threshold}%`;
   document.getElementById('cityAnalysisText').textContent = config.description;
-  document.getElementById('previewCaption').textContent = 
-    `${config.displayName} ${config.unitPlural} colored by average sidewalk shade (SAI).`;
+  document.getElementById('previewCaption').textContent =
+    config.overviewCaption || `${config.displayName} ${config.unitPlural} colored by average sidewalk shade (SAI).`;
+  updateCorridorControlsVisibility();
   
   // Clear existing layers completely
   if (buurtenLayer) {
@@ -107,6 +270,9 @@ function switchCity(cityId) {
     }
     currentBuurtLayer = null;
   }
+  removeGroeneStratenLineLayer();
+  detailShadeValues = [];
+  detailHighlightThresholds = { worst: null, best: null };
   loadedBuurten.clear();
   isDetailView = false;
   hideInfoPanel();
@@ -229,9 +395,9 @@ function hideInfoPanel() {
 // Style neighborhoods based on average shade
 function styleNeighborhoods(feature) {
   const config = getCurrentConfig();
-  const meanShade = feature.properties[`${config.indexField}_mean`] || 0;
+  const meanShade = getMeanShade(feature.properties, config);
   const color = getShadeColor(meanShade);
-  
+
   return {
     fillColor: color,
     weight: 1,
@@ -245,13 +411,33 @@ function styleNeighborhoods(feature) {
 function styleDetailedSidewalks(feature) {
   const config = getCurrentConfig();
   const shadeIndex = feature.properties[config.indexField];
-  
-  return {
+  const base = {
     color: getShadeColor(shadeIndex),
     weight: 2,
     opacity: 0.9,
     fillColor: getShadeColor(shadeIndex),
     fillOpacity: 0.7
+  };
+
+  if (!(isGreenStreetsView() && isDetailView && corridorHighlightMode !== 'none')) {
+    return base;
+  }
+
+  const highlighted = isSidewalkHighlighted(shadeIndex);
+  if (highlighted) {
+    return {
+      ...base,
+      weight: 2.4,
+      opacity: 1,
+      fillOpacity: 0.9
+    };
+  }
+
+  return {
+    ...base,
+    weight: 1,
+    opacity: 0.14,
+    fillOpacity: 0.06
   };
 }
 
@@ -275,20 +461,24 @@ async function loadMapData() {
         const props = feature.properties;
         const areaName = props[config.nameField] || 'Unknown';
         const buurtCode = props[config.idField] || props.CBS_Buurtcode || 'N/A';
-        const meanShade = props[`${config.indexField}_mean`] || 0;
-        const segmentCount = props[`${config.indexField}_count`] || 0;
+        const meanShade = getMeanShade(props, config);
+        const segmentCount = getSegmentCount(props, config);
         const coverage = props.coverage_excellent || 0;
-        const category = getShadeCategory(meanShade);
-        const color = getShadeColor(meanShade);
+        const hasData = meanShade !== null && segmentCount > 0;
+        const category = hasData ? getShadeCategory(meanShade) : 'No sidewalk data';
+        const color = hasData ? getShadeColor(meanShade) : '#666666';
+        const shadeText = hasData ? `${(meanShade * 100).toFixed(0)}%` : 'N/A';
+        const segmentLabel = hasData ? `${segmentCount} sidewalk segments` : 'No matching sidewalk segments';
+        const titleName = formatAreaDisplayName(areaName, config);
 
         layer.bindTooltip(`
-          <strong>${config.name === 'Cape Town' ? 'Ward ' + areaName : areaName}</strong><br>
+          <strong>${titleName}</strong><br>
           <span style="display:inline-flex;align-items:center;gap:6px;">
             <span style="display:inline-block;width:10px;height:10px;background:${color};border:1px solid #555;"></span>
             <span>Shade Quality: ${category}</span>
           </span><br>
-          Average Shade Availability: ${(meanShade * 100).toFixed(0)}%<br>
-          ${segmentCount} sidewalk segments
+          Average Shade Availability: ${shadeText}<br>
+          ${segmentLabel}
         `, {
           permanent: false,
           direction: 'top',
@@ -310,6 +500,7 @@ async function loadMapData() {
         });
       }
     }).addTo(map);
+    await ensureGroeneStratenLineLayer();
     
     // Set map bounds
     const bounds = buurtenLayer.getBounds();
@@ -481,10 +672,14 @@ async function loadNeighborhoodDetails(areaCode, areaName, meanShade, segmentCou
 
 // Show neighborhood overview when no detailed data available
 function showNeighborhoodOverview(areaName, meanShade, segmentCount, coverage) {
-  const category = getShadeCategory(meanShade);
-  const color = getShadeColor(meanShade);
+  const config = getCurrentConfig();
+  const hasData = meanShade !== null && meanShade !== undefined;
+  const category = hasData ? getShadeCategory(meanShade) : 'No sidewalk data';
+  const color = hasData ? getShadeColor(meanShade) : '#666666';
+  const meanText = hasData ? `${(meanShade * 100).toFixed(0)}%` : 'N/A';
+  const coverageText = hasData ? `${coverage.toFixed(1)}%` : 'N/A';
   
-  showInfoPanel((config.name === 'Cape Town' ? 'Ward ' + areaName : areaName), `
+  showInfoPanel(formatAreaDisplayName(areaName, config), `
     <div style="margin-bottom: 16px;">
       <div class="info-stat">
         <span class="info-stat-label">Shade Quality:</span>
@@ -492,7 +687,7 @@ function showNeighborhoodOverview(areaName, meanShade, segmentCount, coverage) {
       </div>
       <div class="info-stat">
         <span class="info-stat-label">Average Shade Availability:</span>
-        <span class="info-stat-value">${(meanShade*100).toFixed(0)}%</span>
+        <span class="info-stat-value">${meanText}</span>
       </div>
       <div class="info-stat">
         <span class="info-stat-label">Sidewalk Segments:</span>
@@ -500,11 +695,11 @@ function showNeighborhoodOverview(areaName, meanShade, segmentCount, coverage) {
       </div>
       <div class="info-stat">
         <span class="info-stat-label">Excellent Coverage:</span>
-        <span class="info-stat-value">${coverage.toFixed(1)}%</span>
+        <span class="info-stat-value">${coverageText}</span>
       </div>
     </div>
     <div style="font-size: 11px; color: #888; font-style: italic;">
-      Detailed segment analysis not available for this neighborhood.
+      Detailed segment analysis not available for this ${config.unit}.
     </div>
   `);
 }
@@ -513,7 +708,6 @@ function showNeighborhoodOverview(areaName, meanShade, segmentCount, coverage) {
 function displayNeighborhoodDetails(buurtData, areaName, meanShade, segmentCount, coverage, areaLayer) {
   // Switch to detail view
   isDetailView = true;
-  activeSidewalkLayer = null;
   
   // Fade neighborhood layer and suspend its interactivity during detail view
   if (buurtenLayer) {
@@ -543,14 +737,20 @@ function displayNeighborhoodDetails(buurtData, areaName, meanShade, segmentCount
     type: 'FeatureCollection',
     features: sidewalksOnly
   };
+
+  // Calculate statistics for sidewalks only
+  const sidewalkShadeValues = sidewalksOnly
+    .map(f => f.properties[config.indexField])
+    .filter(val => val !== null && val !== undefined);
+  detailShadeValues = sidewalkShadeValues;
+  updateDetailHighlightThresholds();
   
   // Create detailed layer with only sidewalks
   currentBuurtLayer = L.geoJSON(sidewalkGeoJSON, {
     style: styleDetailedSidewalks,
     onEachFeature: (feature, layer) => {
       const config = getCurrentConfig();
-  const shadeIndex = feature.properties[config.indexField];
-      const guid = feature.properties.Guid;
+      const shadeIndex = feature.properties[config.indexField];
       const category = getShadeCategory(shadeIndex);
       const chip = getShadeColor(shadeIndex);
       
@@ -564,9 +764,6 @@ function displayNeighborhoodDetails(buurtData, areaName, meanShade, segmentCount
       const p1530 = feature.properties.shade_percent_at_1530;
       const p1800 = feature.properties.shade_percent_at_1800;
       
-      // Only show detailed fields if they exist
-      const hasDetailFields = yrBuilt !== '—' || yrConserve !== '—' || yrMaint !== '—';
-      const hasTimeFields = p1000 != null || p1300 != null || p1530 != null || p1800 != null;
       const bar = (p) => `<span style=\"display:inline-block;height:6px;width:40px;background:${getShadeColor((p||0)/100)};opacity:0.9;\"></span>`;
       const tipHtml = `
         <div style="min-width:240px;">
@@ -598,15 +795,10 @@ function displayNeighborhoodDetails(buurtData, areaName, meanShade, segmentCount
       // No click popup — hover shows rich info
     }
   }).addTo(map);
-  currentBuurtLayer.bringToFront();
+  applyDetailSidewalkStyling();
   
   // Zoom to detail area
   map.fitBounds(areaLayer.getBounds(), { padding: [50, 50] });
-
-  // Calculate statistics for sidewalks only
-  const sidewalkShadeValues = sidewalksOnly
-    .map(f => f.properties[config.indexField])
-    .filter(val => val !== null && val !== undefined);
   
   const avgShade = sidewalkShadeValues.length > 0 ? 
     (sidewalkShadeValues.reduce((sum, val) => sum + val, 0) / sidewalkShadeValues.length) : 0;
@@ -620,7 +812,7 @@ function displayNeighborhoodDetails(buurtData, areaName, meanShade, segmentCount
   const excellentCount = sidewalkShadeValues.filter(val => val >= config.colorScale.veryGood).length;
   const excellentPercentage = sidewalkShadeValues.length > 0 ? (excellentCount / sidewalkShadeValues.length * 100) : 0;
   
-  showInfoPanel((config.name === 'Cape Town' ? 'Ward ' + areaName : areaName) + ' - Detail View', `
+  showInfoPanel(`${formatAreaDisplayName(areaName, config)} - Detail View`, `
     <div style="margin-bottom: 16px;">
       <div class="info-stat">
         <span class="info-stat-label">Sidewalk Segments:</span>
@@ -689,26 +881,34 @@ function showCityOverview() {
   let totalAreas = 0;
   let totalSegments = 0;
   let avgShade = 0;
+  let validAreas = 0;
   let excellentCount = 0;
   
   if (buurtenLayer) {
     buurtenLayer.eachLayer((layer) => {
       const props = layer.feature.properties;
-      const meanShade = props[`${config.indexField}_mean`] || 0;
-      const segmentCount = props[`${config.indexField}_count`] || 0;
+      const meanShade = getMeanShade(props, config);
+      const segmentCount = getSegmentCount(props, config);
       
       totalAreas++;
       totalSegments += segmentCount;
-      avgShade += meanShade;
-      
-      if (meanShade >= 0.75) excellentCount++;
+      if (meanShade !== null && segmentCount > 0) {
+        avgShade += meanShade;
+        validAreas++;
+        if (meanShade >= config.colorScale.veryGood) excellentCount++;
+      }
     });
     
-    avgShade = totalAreas > 0 ? avgShade / totalAreas : 0;
-    const excellentPercentage = totalAreas > 0 ? (excellentCount / totalAreas * 100) : 0;
-    
-    const category = getShadeCategory(avgShade);
-    const color = getShadeColor(avgShade);
+    const meanShadeCity = validAreas > 0 ? avgShade / validAreas : null;
+    const excellentPercentage = validAreas > 0 ? (excellentCount / validAreas * 100) : 0;
+    const category = meanShadeCity !== null ? getShadeCategory(meanShadeCity) : 'No sidewalk data';
+    const color = meanShadeCity !== null ? getShadeColor(meanShadeCity) : '#666666';
+    const cityAvgText = meanShadeCity !== null ? `${(meanShadeCity * 100).toFixed(0)}% (${category})` : 'N/A';
+    const modeText = isGreenStreetsView()
+      ? (corridorHighlightMode === 'none'
+        ? 'No sidewalk highlighting'
+        : `${corridorHighlightMode} ${corridorHighlightPercent}% of sidewalks (detail view)`)
+      : '';
     
     showInfoPanel(`${config.displayName} Overview`, `
       <div style="margin-bottom: 16px;">
@@ -724,7 +924,7 @@ function showCityOverview() {
           <span class="info-stat-label">City-wide Average:</span>
           <span class="info-stat-value">
             <span style="display:inline-block;width:10px;height:10px;background:${color};border:1px solid #555;margin-right:6px;"></span>
-            ${(avgShade*100).toFixed(0)}% (${category})
+            ${cityAvgText}
           </span>
         </div>
         <div class="info-stat">
@@ -735,9 +935,19 @@ function showCityOverview() {
           <span class="info-stat-label">Shade Threshold:</span>
           <span class="info-stat-value">${config.threshold}%</span>
         </div>
+        ${isGreenStreetsView() ? `
+        <div class="info-stat">
+          <span class="info-stat-label">${config.unitPlural.charAt(0).toUpperCase() + config.unitPlural.slice(1)} with data:</span>
+          <span class="info-stat-value">${validAreas} / ${totalAreas}</span>
+        </div>` : ''}
+        ${isGreenStreetsView() ? `
+        <div class="info-stat">
+          <span class="info-stat-label">Current focus:</span>
+          <span class="info-stat-value">${modeText}</span>
+        </div>` : ''}
       </div>
       <div style="font-size: 12px; color: #888; margin-top: 12px; padding-top: 12px; border-top: 1px solid #333;">
-        Click any ${config.unit} to view detailed sidewalk data
+        ${config.detailHint || `Click any ${config.unit} to view detailed sidewalk data`}
       </div>
     `);
   }
@@ -745,6 +955,8 @@ function showCityOverview() {
 
 function returnToOverview() {
   isDetailView = false;
+  detailShadeValues = [];
+  detailHighlightThresholds = { worst: null, best: null };
   
   // Remove detail layer
   if (currentBuurtLayer) {
@@ -758,6 +970,7 @@ function returnToOverview() {
   // Restore neighborhood layer
   if (buurtenLayer) {
     buurtenLayer.setStyle((feature) => styleNeighborhoods(feature));
+    if (groeneStratenLineLayer) groeneStratenLineLayer.bringToFront();
     // Ensure tooltips work (rebind if needed)
     buurtenLayer.eachLayer((l) => {
       // If tooltips were auto-closed, let Leaflet recreate on demand via existing bindings
@@ -817,7 +1030,7 @@ function dismissNotice() {
   const notice = document.getElementById('dataQualityNotice');
   if (notice) {
     notice.classList.remove('visible');
-    sessionStorage.setItem('noticeD ismissed', 'true');
+    sessionStorage.setItem('noticeDismissed', 'true');
   }
 }
 
@@ -858,6 +1071,25 @@ document.addEventListener('DOMContentLoaded', () => {
       switchCity(e.target.value);
     });
   }
+
+  const modeSelect = document.getElementById('corridorHighlightMode');
+  const percentRange = document.getElementById('corridorHighlightPercent');
+  const percentLabel = document.getElementById('corridorHighlightPercentLabel');
+  const applyCorridorControls = () => {
+    if (modeSelect) corridorHighlightMode = modeSelect.value;
+    if (percentRange) corridorHighlightPercent = Number(percentRange.value);
+    if (percentLabel) percentLabel.textContent = `${corridorHighlightPercent}%`;
+    if (isDetailView) {
+      applyDetailSidewalkStyling();
+    } else if (isGreenStreetsView()) {
+      showCityOverview();
+    }
+  };
+
+  if (modeSelect) modeSelect.addEventListener('change', applyCorridorControls);
+  if (percentRange) percentRange.addEventListener('input', applyCorridorControls);
+  applyCorridorControls();
+  updateCorridorControlsVisibility();
   
   // Check data quality notice on initial load
   checkAndShowNotice();
