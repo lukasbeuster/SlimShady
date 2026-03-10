@@ -1,0 +1,3337 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9133998,
+          52.3928206
+        ]
+      },
+      "properties": {
+        "name": "Mosplein",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 700343149,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9120806,
+          52.3985872
+        ]
+      },
+      "properties": {
+        "name": "Pinksterbloemstraat",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 700343163,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9139191,
+          52.3963216
+        ]
+      },
+      "properties": {
+        "name": "Sneeuwbalstraat",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 700343184,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9139017,
+          52.393157
+        ]
+      },
+      "properties": {
+        "name": "Mosplein",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 700343193,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9141452,
+          52.3964155
+        ]
+      },
+      "properties": {
+        "name": "Sneeuwbalstraat",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 700343197,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9120999,
+          52.3987916
+        ]
+      },
+      "properties": {
+        "name": "Pinksterbloemstraat",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 700343208,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9199903,
+          52.4053005
+        ]
+      },
+      "properties": {
+        "name": "Boven IJ Ziekenhuis",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 702260237,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9182278,
+          52.3852901
+        ]
+      },
+      "properties": {
+        "name": "Havikslaan",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 702260295,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9223155,
+          52.4057722
+        ]
+      },
+      "properties": {
+        "name": "Oosterlengte",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 702260323,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9220004,
+          52.4061889
+        ]
+      },
+      "properties": {
+        "name": "Oosterlengte",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 702260708,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9284647,
+          52.3946581
+        ]
+      },
+      "properties": {
+        "name": "Rode Kruisstraat",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 702260786,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9111696,
+          52.4057077
+        ]
+      },
+      "properties": {
+        "name": "Tjalkstraat",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 702260848,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9226567,
+          52.386261
+        ]
+      },
+      "properties": {
+        "name": "Hamerstraat",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 702260875,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.920234,
+          52.4058388
+        ]
+      },
+      "properties": {
+        "name": "Boven IJ Ziekenhuis",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 702260887,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9117219,
+          52.3874889
+        ]
+      },
+      "properties": {
+        "name": "Meidoornplein",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 702260892,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9135914,
+          52.3875597
+        ]
+      },
+      "properties": {
+        "name": "Hagedoornplein",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 702260906,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9251275,
+          52.389101
+        ]
+      },
+      "properties": {
+        "name": "Merelstraat",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 702260925,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9288408,
+          52.394865
+        ]
+      },
+      "properties": {
+        "name": "Rode Kruisstraat",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 702260934,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.910043,
+          52.4049759
+        ]
+      },
+      "properties": {
+        "name": "Tjalkstraat",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 702260959,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9138446,
+          52.4078881
+        ]
+      },
+      "properties": {
+        "name": "Statenjachtstraat",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 702260973,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9110572,
+          52.3874015
+        ]
+      },
+      "properties": {
+        "name": "Meidoornplein",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 702261015,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9248606,
+          52.3888852
+        ]
+      },
+      "properties": {
+        "name": "Merelstraat",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 702261067,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9135655,
+          52.4078927
+        ]
+      },
+      "properties": {
+        "name": "Statenjachtstraat",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 702261199,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9176193,
+          52.3850591
+        ]
+      },
+      "properties": {
+        "name": "Havikslaan",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 702261223,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9209431,
+          52.3859979
+        ]
+      },
+      "properties": {
+        "name": "Hamerstraat",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 702261239,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9290966,
+          52.4039197
+        ]
+      },
+      "properties": {
+        "name": "G.J. Scheurleerweg",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 702261273,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9134351,
+          52.3874599
+        ]
+      },
+      "properties": {
+        "name": "Hagedoornplein",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 702261281,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9269245,
+          52.3926218
+        ]
+      },
+      "properties": {
+        "name": "Waddenweg",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 798681777,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9345553,
+          52.3941606
+        ]
+      },
+      "properties": {
+        "name": "Nieuwe Purmerweg",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 1079768882,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9395228,
+          52.392691
+        ]
+      },
+      "properties": {
+        "name": "Wervershoofstraat",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 1079768915,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9231737,
+          52.387722
+        ]
+      },
+      "properties": {
+        "name": "Johan van Hasseltweg",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 1079768982,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9322578,
+          52.3981458
+        ]
+      },
+      "properties": {
+        "name": "Het Breed",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 1079901801,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9376046,
+          52.4023409
+        ]
+      },
+      "properties": {
+        "name": "Bakkerswaal",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 1079901829,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9230739,
+          52.4081644
+        ]
+      },
+      "properties": {
+        "name": "Grootzeil",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 1080048240,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9241196,
+          52.4086637
+        ]
+      },
+      "properties": {
+        "name": "Grootzeil",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 1080048245,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.907681,
+          52.3991742
+        ]
+      },
+      "properties": {
+        "name": "Slijperweg",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 1080057245,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9159799,
+          52.4036433
+        ]
+      },
+      "properties": {
+        "name": "Fluitschipstraat",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 1080164430,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9074916,
+          52.3993263
+        ]
+      },
+      "properties": {
+        "name": "Slijperweg",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 1539260693,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9051396,
+          52.3891781
+        ]
+      },
+      "properties": {
+        "name": "De Beweegspecialist Sportartsen (Lokatie Noord)",
+        "type": "health_centre",
+        "dwell_potential": "medium",
+        "osm_id": 2847160396,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9084706,
+          52.3887221
+        ]
+      },
+      "properties": {
+        "name": "Huisartsen om de Hoek",
+        "type": "health_centre",
+        "dwell_potential": "medium",
+        "osm_id": 2847189567,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9065365,
+          52.3977722
+        ]
+      },
+      "properties": {
+        "name": "De Heldringschool",
+        "type": "school",
+        "dwell_potential": "high",
+        "osm_id": 2847219573,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.916392,
+          52.4057877
+        ]
+      },
+      "properties": {
+        "name": "PI-school Professor Waterink Noord",
+        "type": "school",
+        "dwell_potential": "high",
+        "osm_id": 2847282893,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9170293,
+          52.4056246
+        ]
+      },
+      "properties": {
+        "name": "MOC 't Kabouterhuis (locatie noord)",
+        "type": "health_centre",
+        "dwell_potential": "medium",
+        "osm_id": 2847283614,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.918763,
+          52.3967027
+        ]
+      },
+      "properties": {
+        "name": "Buurthuis Het Anker",
+        "type": "community_centre",
+        "dwell_potential": "high",
+        "osm_id": 2847285805,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9317251,
+          52.3972352
+        ]
+      },
+      "properties": {
+        "name": "Breedhuis",
+        "type": "community_centre",
+        "dwell_potential": "high",
+        "osm_id": 2848300967,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9357847,
+          52.3996774
+        ]
+      },
+      "properties": {
+        "name": "Modestraat",
+        "type": "community_centre",
+        "dwell_potential": "high",
+        "osm_id": 2848301069,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9373846,
+          52.3983983
+        ]
+      },
+      "properties": {
+        "name": "Smile Place Tandartsen",
+        "type": "health_centre",
+        "dwell_potential": "medium",
+        "osm_id": 2848301101,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9394357,
+          52.3987168
+        ]
+      },
+      "properties": {
+        "name": "Windhausen huisarts",
+        "type": "health_centre",
+        "dwell_potential": "medium",
+        "osm_id": 2848301908,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9357902,
+          52.3962532
+        ]
+      },
+      "properties": {
+        "name": "De Buikslotermeer",
+        "type": "school",
+        "dwell_potential": "high",
+        "osm_id": 2848306152,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9322309,
+          52.3947044
+        ]
+      },
+      "properties": {
+        "name": "Basisschool de Capelle",
+        "type": "school",
+        "dwell_potential": "high",
+        "osm_id": 2848468473,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9398446,
+          52.3966737
+        ]
+      },
+      "properties": {
+        "name": "Olof Palmeplein",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 3312553916,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9372359,
+          52.4022469
+        ]
+      },
+      "properties": {
+        "name": "Bakkerswaal",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 3315443309,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9230305,
+          52.3880181
+        ]
+      },
+      "properties": {
+        "name": "Johan van Hasseltweg",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 3315443311,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9342105,
+          52.3944686
+        ]
+      },
+      "properties": {
+        "name": "Nieuwe Purmerweg",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 3315443312,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9161995,
+          52.4037332
+        ]
+      },
+      "properties": {
+        "name": "Fluitschipstraat",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 3316951512,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9063346,
+          52.3981779
+        ]
+      },
+      "properties": {
+        "name": "Klaprozenweg",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 3317508419,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9061306,
+          52.3989919
+        ]
+      },
+      "properties": {
+        "name": "Floraweg",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 3317508420,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9142573,
+          52.3851779
+        ]
+      },
+      "properties": {
+        "name": "Spreeuwenpark",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 3317508422,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9172424,
+          52.4079387
+        ]
+      },
+      "properties": {
+        "name": "Huis van de Wijk \"De Banne\"",
+        "type": "community_centre",
+        "dwell_potential": "high",
+        "osm_id": 3773661664,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9389175,
+          52.3999371
+        ]
+      },
+      "properties": {
+        "name": "Buikslotermeerplein",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 3817289882,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9290089,
+          52.4037277
+        ]
+      },
+      "properties": {
+        "name": "G.J. Scheurleerweg",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 4105376389,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9332053,
+          52.4086109
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 4359475634,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.937307,
+          52.3976988
+        ]
+      },
+      "properties": {
+        "name": "Winkelcentrum",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 4620947747,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9117879,
+          52.4026083
+        ]
+      },
+      "properties": {
+        "name": "Barkpad",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 4620947758,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9114172,
+          52.4027032
+        ]
+      },
+      "properties": {
+        "name": "Barkpad",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 4620948072,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.931794,
+          52.3980538
+        ]
+      },
+      "properties": {
+        "name": "Het Breed",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 4621136186,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9050225,
+          52.3884921
+        ]
+      },
+      "properties": {
+        "name": "Grasweg",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 4621136520,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9051472,
+          52.3886648
+        ]
+      },
+      "properties": {
+        "name": "Grasweg",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 4621136521,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9396,
+          52.3994425
+        ]
+      },
+      "properties": {
+        "name": "Buikslotermeerplein",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 4623269510,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9178565,
+          52.407926
+        ]
+      },
+      "properties": {
+        "name": "Banne Buikslootlaan",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 4629696001,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9101876,
+          52.406192
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 4856154710,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9114532,
+          52.4073487
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 4856154711,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9168709,
+          52.3861348
+        ]
+      },
+      "properties": {
+        "name": "De Speelvogel",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 4931472229,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.912674,
+          52.3929593
+        ]
+      },
+      "properties": {
+        "name": "Mosplein",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 5347819913,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9127514,
+          52.3930025
+        ]
+      },
+      "properties": {
+        "name": "Mosplein",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 5347819914,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9145531,
+          52.4090677
+        ]
+      },
+      "properties": {
+        "name": "Huisartsenpraktijk Kadoelerbreek",
+        "type": "health_centre",
+        "dwell_potential": "medium",
+        "osm_id": 5509217509,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9192598,
+          52.3891842
+        ]
+      },
+      "properties": {
+        "name": "Noorderpark",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 5737582481,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9057855,
+          52.4014586
+        ]
+      },
+      "properties": {
+        "name": "Metaalbewerkerweg",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 5770024987,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9286878,
+          52.3973472
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 5787123058,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9204141,
+          52.3952085
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 5902469684,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9317589,
+          52.4023546
+        ]
+      },
+      "properties": {
+        "name": "Station Noord",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 6644213910,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9318079,
+          52.4023966
+        ]
+      },
+      "properties": {
+        "name": "Station Noord",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 6644213911,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9318609,
+          52.4024375
+        ]
+      },
+      "properties": {
+        "name": "Station Noord",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 6644213912,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9319155,
+          52.4024788
+        ]
+      },
+      "properties": {
+        "name": "Station Noord",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 6644213913,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9319695,
+          52.4025212
+        ]
+      },
+      "properties": {
+        "name": "Station Noord",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 6644213914,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9320241,
+          52.4025617
+        ]
+      },
+      "properties": {
+        "name": "Station Noord",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 6644213915,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9320775,
+          52.4026015
+        ]
+      },
+      "properties": {
+        "name": "Station Noord",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 6644213916,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9321318,
+          52.4026445
+        ]
+      },
+      "properties": {
+        "name": "Station Noord",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 6644213917,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9334397,
+          52.4020496
+        ]
+      },
+      "properties": {
+        "name": "Station Noord",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 6644213918,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9333894,
+          52.4020053
+        ]
+      },
+      "properties": {
+        "name": "Station Noord",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 6644213919,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9333341,
+          52.4019627
+        ]
+      },
+      "properties": {
+        "name": "Station Noord",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 6644213920,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9332831,
+          52.4019232
+        ]
+      },
+      "properties": {
+        "name": "Station Noord",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 6644213921,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9332244,
+          52.4018854
+        ]
+      },
+      "properties": {
+        "name": "Station Noord",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 6644213922,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9331725,
+          52.4018418
+        ]
+      },
+      "properties": {
+        "name": "Station Noord",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 6644213923,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9331205,
+          52.4018015
+        ]
+      },
+      "properties": {
+        "name": "Station Noord",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 6644213924,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9330672,
+          52.4017606
+        ]
+      },
+      "properties": {
+        "name": "Station Noord",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 6644213925,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.915907,
+          52.4003119
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 6702578543,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9197562,
+          52.4060433
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 7115678328,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9132884,
+          52.4022141
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 7124932075,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.919378,
+          52.3892859
+        ]
+      },
+      "properties": {
+        "name": "Noorderpark",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 7126264704,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9326441,
+          52.4025756
+        ]
+      },
+      "properties": {
+        "name": "Station Noord",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 8901213130,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9220983,
+          52.4051124
+        ]
+      },
+      "properties": {
+        "name": "Huisartsenpost Noord",
+        "type": "health_centre",
+        "dwell_potential": "medium",
+        "osm_id": 9780223805,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9258642,
+          52.4003757
+        ]
+      },
+      "properties": {
+        "name": "Waldorf aan de Werf",
+        "type": "school",
+        "dwell_potential": "high",
+        "osm_id": 10779199678,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9373867,
+          52.404302
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 10896489863,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9299678,
+          52.4049217
+        ]
+      },
+      "properties": {
+        "name": "Abbs Elzenhagen",
+        "type": "school",
+        "dwell_potential": "high",
+        "osm_id": 11035490559,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9285313,
+          52.3938814
+        ]
+      },
+      "properties": {
+        "name": "Buurtcentrum De Driehoek",
+        "type": "community_centre",
+        "dwell_potential": "high",
+        "osm_id": 11343205857,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9076309,
+          52.3983147
+        ]
+      },
+      "properties": {
+        "name": "Floraweg",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 11394362593,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9329488,
+          52.3935368
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 12027030912,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9311597,
+          52.3956673
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 12199709653,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.925086,
+          52.3900014
+        ]
+      },
+      "properties": {
+        "name": "Merelstraat",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 12513957280,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9248966,
+          52.3898479
+        ]
+      },
+      "properties": {
+        "name": "Merelstraat",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 12513957281,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9051033,
+          52.3891306
+        ]
+      },
+      "properties": {
+        "name": "Asterweg Medisch Centrum",
+        "type": "health_centre",
+        "dwell_potential": "medium",
+        "osm_id": 12840406339,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9234333,
+          52.4037811
+        ]
+      },
+      "properties": {
+        "name": "Mentrum",
+        "type": "health_centre",
+        "dwell_potential": "medium",
+        "osm_id": 12865329664,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9246337,
+          52.3881116
+        ]
+      },
+      "properties": {
+        "name": "Johan van Hasseltweg",
+        "type": "bus_stop",
+        "dwell_potential": "high",
+        "osm_id": 13061828888,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9261752,
+          52.3991324
+        ]
+      },
+      "properties": {
+        "name": "Xplore agora",
+        "type": "school",
+        "dwell_potential": "high",
+        "osm_id": 13139025937,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9253177,
+          52.3886137
+        ]
+      },
+      "properties": {
+        "name": "Metropolis lyceum",
+        "type": "school",
+        "dwell_potential": "high",
+        "osm_id": 13513986801,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9243793,
+          52.4078388
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 13608889901,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9258428,
+          52.4091922
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 13609020101,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9230212,
+          52.4092022
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 13622639301,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9232206,
+          52.4075134
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 13623168801,
+        "osm_type": "node"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9159287,
+          52.3919676
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 43697161,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9077278,
+          52.3891408
+        ]
+      },
+      "properties": {
+        "name": "Volewijk",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 53470418,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9230119,
+          52.3882562
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 65203634,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9237434,
+          52.3896356
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 65211065,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9259449,
+          52.3927528
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 65388801,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9075174,
+          52.3908277
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 71502195,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9157645,
+          52.407211
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 86983904,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9092253,
+          52.3915506
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 87242444,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9129552,
+          52.3983777
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 111312282,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9111354,
+          52.4050225
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 111323076,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9069259,
+          52.4024381
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 111323088,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9283675,
+          52.3871223
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 183548111,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9134623,
+          52.3962639
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 233784616,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9107663,
+          52.3885031
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 255772689,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9305102,
+          52.3986665
+        ]
+      },
+      "properties": {
+        "name": "Bij Bosshardt",
+        "type": "community_centre",
+        "dwell_potential": "high",
+        "osm_id": 280782974,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9394655,
+          52.3988052
+        ]
+      },
+      "properties": {
+        "name": "Gezondheidscentrum Buikslotermeerplein",
+        "type": "health_centre",
+        "dwell_potential": "medium",
+        "osm_id": 280782983,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9349196,
+          52.4079414
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 344153403,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9265975,
+          52.3953881
+        ]
+      },
+      "properties": {
+        "name": "Damstede Lyceum",
+        "type": "school",
+        "dwell_potential": "high",
+        "osm_id": 373953853,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9269527,
+          52.3963349
+        ]
+      },
+      "properties": {
+        "name": "Clusius College",
+        "type": "school",
+        "dwell_potential": "high",
+        "osm_id": 373953911,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9164736,
+          52.4065976
+        ]
+      },
+      "properties": {
+        "name": "IKC Zeven Zeeën",
+        "type": "school",
+        "dwell_potential": "high",
+        "osm_id": 421852127,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9301218,
+          52.3918987
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 440426143,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9369821,
+          52.3925933
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 440737272,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9104968,
+          52.4032955
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 481891977,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9284139,
+          52.4015481
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 490597973,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9238787,
+          52.3976973
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 502467716,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9236913,
+          52.3976269
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 502467717,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9199139,
+          52.4027856
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 530112774,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9100976,
+          52.389499
+        ]
+      },
+      "properties": {
+        "name": "Pekmarkt",
+        "type": "market",
+        "dwell_potential": "medium",
+        "osm_id": 533755352,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9188639,
+          52.399211
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 552613467,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.928562,
+          52.4041373
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 561107079,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9205902,
+          52.4094017
+        ]
+      },
+      "properties": {
+        "name": "De Zeeslag",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 573590501,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9206481,
+          52.4076879
+        ]
+      },
+      "properties": {
+        "name": "Driemaster",
+        "type": "school",
+        "dwell_potential": "high",
+        "osm_id": 573590512,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9311983,
+          52.4018771
+        ]
+      },
+      "properties": {
+        "name": "MBO College Noord (hoofdlocatie)",
+        "type": "school",
+        "dwell_potential": "high",
+        "osm_id": 604765185,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9092966,
+          52.4038062
+        ]
+      },
+      "properties": {
+        "name": "Damstede 2 - Agora",
+        "type": "school",
+        "dwell_potential": "high",
+        "osm_id": 623957806,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.90594,
+          52.3917587
+        ]
+      },
+      "properties": {
+        "name": "DKC De IJsbreker",
+        "type": "school",
+        "dwell_potential": "high",
+        "osm_id": 646102712,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9353314,
+          52.3994563
+        ]
+      },
+      "properties": {
+        "name": "Buikslotermeermarkt",
+        "type": "market",
+        "dwell_potential": "medium",
+        "osm_id": 712688223,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9137778,
+          52.4042867
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 916477447,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9134704,
+          52.4039452
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 916477448,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9149555,
+          52.4054367
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 916477449,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9142874,
+          52.4048578
+        ]
+      },
+      "properties": {
+        "name": "Waterplein",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 916477497,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9125048,
+          52.4052264
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 916477502,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9129122,
+          52.3960384
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 962271955,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9161757,
+          52.4057657
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 982243723,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9048574,
+          52.4084121
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1051385530,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.90548,
+          52.4078314
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1051388588,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9051174,
+          52.4077489
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1051388608,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9051607,
+          52.3980786
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1053028779,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9129646,
+          52.4013853
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1081828671,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9259595,
+          52.4002835
+        ]
+      },
+      "properties": {
+        "name": "Kindercampus Mokum",
+        "type": "school",
+        "dwell_potential": "high",
+        "osm_id": 1131999174,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9367542,
+          52.402636
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1153891372,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9377165,
+          52.4032877
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1153891375,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9111518,
+          52.3866661
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1153920094,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9132491,
+          52.3903012
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1154044997,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.939224,
+          52.4018285
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1154389863,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9385817,
+          52.4010925
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1184526973,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9197082,
+          52.3956022
+        ]
+      },
+      "properties": {
+        "name": "Natuurspeeltuin",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1184528021,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9105436,
+          52.3988379
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1184528647,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9375009,
+          52.3969829
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1187667461,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9168597,
+          52.386235
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1207039239,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9215133,
+          52.3868334
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1225565920,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9160213,
+          52.3947196
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1227122875,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.908926,
+          52.4051505
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1227199819,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9225155,
+          52.3944545
+        ]
+      },
+      "properties": {
+        "name": "Speelbos Noorderpark",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1228266562,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9186004,
+          52.3869045
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1228518357,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9094142,
+          52.386538
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1228592638,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9316793,
+          52.4082623
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1228821679,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.931868,
+          52.4083825
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1228821680,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9254161,
+          52.4006935
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1314216062,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9156224,
+          52.3932963
+        ]
+      },
+      "properties": {
+        "name": "Oranje Nassauschool",
+        "type": "school",
+        "dwell_potential": "high",
+        "osm_id": 1349249581,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9193671,
+          52.3977881
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1352771928,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9308124,
+          52.3988022
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1368825581,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9386546,
+          52.3938792
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1428564108,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.940239,
+          52.403498
+        ]
+      },
+      "properties": {
+        "name": "Montessorischool Boven 't IJ",
+        "type": "school",
+        "dwell_potential": "high",
+        "osm_id": 1445440354,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.907134,
+          52.3932705
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1446303707,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9350245,
+          52.4055823
+        ]
+      },
+      "properties": {
+        "name": "unnamed",
+        "type": "playground",
+        "dwell_potential": "medium",
+        "osm_id": 1473604937,
+        "osm_type": "way"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9123696,
+          52.4003629
+        ]
+      },
+      "properties": {
+        "name": "Over Y College",
+        "type": "school",
+        "dwell_potential": "high",
+        "osm_id": 1473865365,
+        "osm_type": "way"
+      }
+    }
+  ]
+}

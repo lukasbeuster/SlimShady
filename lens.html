@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shade Intelligence — Amsterdam Neighbourhoods</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="lens.css" />
+</head>
+<body>
+  <div id="euroasis-app">
+    <aside id="sidebar">
+      <div id="sidebar-header">
+        <div class="ea-logo">SHADE INTELLIGENCE</div>
+        <div class="ea-subtitle">Amsterdam · Neighbourhood Analysis</div>
+        <div class="ea-researcher-line">Research lens · K-Buurten · Jan Maijenbuurt · Vogelbuurt</div>
+      </div>
+
+      <div id="sidebar-body">
+        <div id="neighbourhood-tabs">
+          <button class="nav-arrow" id="nav-prev" aria-label="Previous neighbourhood">←</button>
+          <div class="tab-buttons">
+            <button class="tab-btn active" data-id="k_buurten">K-Buurten</button>
+            <button class="tab-btn" data-id="jan_maijenbuurt">Jan Maijen</button>
+            <button class="tab-btn" data-id="vogelbuurt">Vogelbuurt</button>
+          </div>
+          <button class="nav-arrow" id="nav-next" aria-label="Next neighbourhood">→</button>
+        </div>
+
+        <div id="stats-panel">
+          <div id="stats-loading" class="stats-loading">Loading data...</div>
+          <div id="stats-content" style="display:none;">
+            <div class="stats-name" id="stats-name"></div>
+            <div class="stats-stadsdeel" id="stats-stadsdeel"></div>
+            <div class="stats-description" id="stats-description"></div>
+
+            <div class="stats-section">
+              <div class="stats-label">SHADE COVERAGE</div>
+              <div class="shade-bar-wrap">
+                <div class="shade-bar-track">
+                  <div class="shade-bar-fill" id="shade-bar-fill"></div>
+                </div>
+                <div class="shade-bar-value" id="shade-bar-value"></div>
+              </div>
+            </div>
+
+            <div class="stats-section">
+              <div class="stats-label">BY QUALITY</div>
+              <div id="quality-breakdown"></div>
+            </div>
+
+            <div class="stats-section" id="extremes-section">
+              <div class="stats-extremes" id="stats-extremes"></div>
+            </div>
+
+            <div class="stats-section">
+              <div class="stats-label">SHADE BY TIME OF DAY</div>
+              <div id="time-strip"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="layers-panel">
+          <div class="layers-title">LAYERS</div>
+          <label class="toggle-row">
+            <span class="toggle-checkbox">
+              <input type="checkbox" id="layer-choropleth" checked>
+              <span class="toggle-mark"></span>
+            </span>
+            <span class="toggle-label">Shade quality (SAI)</span>
+          </label>
+          <label class="toggle-row">
+            <span class="toggle-checkbox">
+              <input type="checkbox" id="layer-sidewalk">
+              <span class="toggle-mark"></span>
+            </span>
+            <span class="toggle-label">Sidewalk detail</span>
+          </label>
+          <label class="toggle-row" id="poi-row">
+            <span class="toggle-checkbox">
+              <input type="checkbox" id="layer-poi" disabled>
+              <span class="toggle-mark"></span>
+            </span>
+            <span class="toggle-label toggle-label-muted">POI markers <span id="poi-status">(data pending)</span></span>
+          </label>
+
+          <div class="layers-divider"></div>
+          <div class="layers-title">MAP BASE</div>
+          <div class="basemap-row">
+            <label class="basemap-option">
+              <input type="radio" name="basemap" value="dark" checked>
+              <span>CartoDB Dark</span>
+            </label>
+            <label class="basemap-option">
+              <input type="radio" name="basemap" value="satellite">
+              <span>Satellite</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div id="sidebar-footer">
+        <a href="index.html" class="footer-link">↗ Open in main dashboard</a>
+        <div class="footer-credit">Slim Shady · Senseable City Lab, MIT</div>
+      </div>
+    </aside>
+
+    <div id="map-container">
+      <div id="map"></div>
+      <div id="ea-loading" class="ea-loading">Loading<span class="ea-spinner"></span></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="lens.js"></script>
+</body>
+</html>
