@@ -307,6 +307,41 @@
       border-top: 1px solid #252525;
     }
 
+    /* Shade simulation process video */
+    .process-media {
+      margin: 18px 0 8px;
+    }
+
+    .process-media .preview {
+      max-width: min(560px, 100%);
+      margin: 0 auto;
+    }
+
+    .process-heading {
+      font-size: 16px;
+      font-weight: 500;
+      color: #e6e6e6;
+      margin-bottom: 6px;
+    }
+
+    .process-lead {
+      color: #8a8a8a;
+      font-size: 13px;
+      line-height: 1.6;
+      max-width: 720px;
+      margin: 0 auto 12px;
+      text-align: center;
+    }
+
+    .shade-day-video {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      display: block;
+      object-fit: cover;
+      background: #0a0a0a;
+      vertical-align: middle;
+    }
+
     .palette-comparison {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -987,6 +1022,32 @@
       (Or Aleksandrowicz et al., 2025).
     </p>
 
+    <div class="process-media" aria-label="Shade simulation process">
+      <h3 class="process-heading" style="text-align:center;">Under the hood</h3>
+      <p class="process-lead">
+        A day of shade simulation: how solar geometry and urban form cast shifting shadows across the city,
+        the computational basis behind the sidewalk Shade Availability Index.
+      </p>
+      <figure class="preview">
+        <span class="preview-badge">Simulation</span>
+        <video
+          id="shadeDayVideo"
+          class="shade-day-video"
+          poster="media/shade_day.jpg"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          aria-label="Shade patterns evolving over a summer day">
+          <source src="media/shade_day.mp4" type="video/mp4">
+        </video>
+        <figcaption class="preview-caption">
+          Shade evolving over daytime hours on the summer solstice — the simulation behind SAI.
+        </figcaption>
+      </figure>
+    </div>
+
     <div class="about-layout">
       <div class="howto">
         <h3>How to use the map</h3>
@@ -1266,6 +1327,25 @@
       }
       scrollTimeout = setTimeout(handleScroll, 100);
     });
+
+    // Play shade simulation only while visible
+    (function setupShadeDayVideo() {
+      const video = document.getElementById('shadeDayVideo');
+      if (!video || !('IntersectionObserver' in window)) return;
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const playPromise = video.play();
+            if (playPromise && typeof playPromise.catch === 'function') {
+              playPromise.catch(() => {});
+            }
+          } else {
+            video.pause();
+          }
+        });
+      }, { threshold: 0.25 });
+      observer.observe(video);
+    })();
     
   </script>
 </body>
