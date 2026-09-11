@@ -142,10 +142,17 @@
       margin-bottom: 48px;
     }
     
-    .scroll-indicator {
+    .scroll-actions {
       position: absolute;
       bottom: 40px;
       left: 60px;
+      display: flex;
+      align-items: flex-end;
+      gap: 28px;
+      z-index: 2;
+    }
+
+    .scroll-indicator {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -154,6 +161,10 @@
       font-weight: 300;
       cursor: pointer;
       transition: color 0.3s ease;
+      background: none;
+      border: 0;
+      padding: 0;
+      font-family: inherit;
     }
     
     .scroll-indicator:hover {
@@ -177,6 +188,10 @@
       height: 8px;
       background: #95C11F;
       animation: scroll-pulse 2s infinite ease-in-out;
+    }
+
+    .scroll-indicator.map-jump .scroll-arrow::after {
+      animation-delay: 0.35s;
     }
     
     @keyframes scroll-pulse {
@@ -307,30 +322,50 @@
       border-top: 1px solid #252525;
     }
 
-    /* Shade simulation process video */
+    /* Shade simulation process video — method basis for the map */
     .process-media {
-      margin: 18px 0 8px;
+      margin: 20px 0 18px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 22px;
+      align-items: center;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid #1f1f1f;
     }
 
-    .process-media .preview {
-      max-width: min(560px, 100%);
-      margin: 0 auto;
+    .process-copy .process-kicker {
+      color: #95C11F;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
     }
 
     .process-heading {
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 500;
       color: #e6e6e6;
-      margin-bottom: 6px;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
     }
 
     .process-lead {
-      color: #8a8a8a;
-      font-size: 13px;
-      line-height: 1.6;
-      max-width: 720px;
-      margin: 0 auto 12px;
-      text-align: center;
+      color: #b0b0b0;
+      font-size: 14px;
+      line-height: 1.7;
+      margin: 0 0 10px;
+      text-align: left;
+      max-width: none;
+    }
+
+    .process-lead:last-child {
+      margin-bottom: 0;
+    }
+
+    .process-media .preview {
+      max-width: none;
+      margin: 0;
     }
 
     .shade-day-video {
@@ -339,7 +374,6 @@
       display: block;
       object-fit: cover;
       background: #0a0a0a;
-      vertical-align: middle;
     }
 
     .palette-comparison {
@@ -766,8 +800,13 @@
         min-width: auto;
       }
       
-      .scroll-indicator {
+      .scroll-actions {
         left: 40px;
+      }
+
+      .process-media {
+        grid-template-columns: 1fr;
+        gap: 14px;
       }
     }
     
@@ -799,8 +838,10 @@
         min-width: auto;
       }
       
-      .scroll-indicator {
+      .scroll-actions {
         left: 24px;
+        gap: 18px;
+        flex-wrap: wrap;
       }
       
       .header, .main-content, .map-header {
@@ -986,9 +1027,15 @@
         </div>
       </main>
       
-      <div class="scroll-indicator" onclick="scrollToAbout()">
-        <div class="scroll-arrow"></div>
-        <span>Learn More</span>
+      <div class="scroll-actions">
+        <button type="button" class="scroll-indicator" onclick="scrollToAbout()">
+          <div class="scroll-arrow"></div>
+          <span>Learn More</span>
+        </button>
+        <button type="button" class="scroll-indicator map-jump" onclick="scrollToMap()">
+          <div class="scroll-arrow"></div>
+          <span>Explore Map</span>
+        </button>
       </div>
     </div>
   </section>
@@ -1022,14 +1069,22 @@
       (Or Aleksandrowicz et al., 2025).
     </p>
 
-    <div class="process-media" aria-label="Shade simulation process">
-      <h3 class="process-heading" style="text-align:center;">Under the hood</h3>
-      <p class="process-lead">
-        A day of shade simulation: how solar geometry and urban form cast shifting shadows across the city,
-        the computational basis behind the sidewalk Shade Availability Index.
-      </p>
+    <div class="process-media" aria-label="Shade simulation basis for the analysis">
+      <div class="process-copy">
+        <div class="process-kicker">Method basis</div>
+        <h3 class="process-heading">What the map is built on</h3>
+        <p class="process-lead">
+          Behind every sidewalk color is a daytime shade simulation: sun position through the day,
+          buildings and trees casting shadows, and sidewalks scored by how often they stay sufficiently shaded.
+          Those time steps roll up into the <strong>Shade Availability Index (SAI)</strong> you explore on the map.
+        </p>
+        <p class="process-lead">
+          The clip shows one such day in <strong>Amsterdam West</strong> — a concrete view of the process that underpins
+          the neighborhood overview and segment-level results below.
+        </p>
+      </div>
       <figure class="preview">
-        <span class="preview-badge">Simulation</span>
+        <span class="preview-badge">Amsterdam West</span>
         <video
           id="shadeDayVideo"
           class="shade-day-video"
@@ -1039,11 +1094,11 @@
           loop
           playsinline
           preload="metadata"
-          aria-label="Shade patterns evolving over a summer day">
+          aria-label="Day of shade simulation in Amsterdam West">
           <source src="media/shade_day.mp4" type="video/mp4">
         </video>
         <figcaption class="preview-caption">
-          Shade evolving over daytime hours on the summer solstice — the simulation behind SAI.
+          A day of shade in Amsterdam West — solar geometry and urban form over the summer solstice daytime window.
         </figcaption>
       </figure>
     </div>
@@ -1293,9 +1348,16 @@
   
   <script>
     // (panel style locked to Bar)
-    // Smooth scroll to about section
+    // Smooth scroll helpers
     function scrollToAbout() {
-      document.getElementById('about-section').scrollIntoView({ 
+      document.getElementById('about-section').scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+
+    function scrollToMap() {
+      document.getElementById('map-section').scrollIntoView({
         behavior: 'smooth',
         block: 'start'
       });
