@@ -106,8 +106,9 @@ const LENS = {
 
     this.map.zoomControl.setPosition('bottomright');
 
+    // CARTO basemap key is domain-locked to this site
     const darkTiles = L.tileLayer(
-      'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+      'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?api_key=cb1_3h0e_2_dddedd5840cf158fb2cbf38a',
       {
         attribution: '© <a href="https://carto.com">CARTO</a> | © <a href="https://openstreetmap.org">OpenStreetMap</a> | © Lukas Beuster, Senseable City Lab MIT / TU Delft 3D Geoinformation',
         maxZoom: 19,
