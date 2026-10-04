@@ -357,10 +357,16 @@ function initializeMap() {
     position: 'bottomright'
   }).addTo(map);
 
-  // CARTO dark basemap (domain-locked API key)
-  L.tileLayer('https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?api_key=cb1_3h0e_2_dddedd5840cf158fb2cbf38a', {
-    attribution: '© <a href="https://carto.com">CARTO</a> | © <a href="https://openstreetmap.org">OpenStreetMap</a>',
+  // Esri Dark Gray basemap (no API key required)
+  // Note: Esri tile URLs use {z}/{y}/{x} order
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles © <a href="https://www.esri.com/">Esri</a> | © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
     maxZoom: 19
+  }).addTo(map);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '',
+    maxZoom: 19,
+    opacity: 0.85
   }).addTo(map);
   
   mapInitialized = true;

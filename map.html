@@ -39,9 +39,9 @@
       height: 100vh;
     }
 
-    /* Dark mode map tiles filter */
+    /* Soften basemap slightly without color-inverting dark tiles */
     .leaflet-tile {
-      filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) invert(1);
+      filter: brightness(0.9) contrast(1.05);
     }
 
     /* Header overlay */

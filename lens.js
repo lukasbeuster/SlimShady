@@ -106,14 +106,24 @@ const LENS = {
 
     this.map.zoomControl.setPosition('bottomright');
 
-    // CARTO dark basemap (domain-locked API key)
-    const darkTiles = L.tileLayer(
-      'https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?api_key=cb1_3h0e_2_dddedd5840cf158fb2cbf38a',
+    // Esri Dark Gray basemap (no API key required)
+    // Note: Esri tile URLs use {z}/{y}/{x} order
+    const darkBase = L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
       {
-        attribution: '© <a href="https://carto.com">CARTO</a> | © <a href="https://openstreetmap.org">OpenStreetMap</a> | © Lukas Beuster, Senseable City Lab MIT / TU Delft 3D Geoinformation',
+        attribution: 'Tiles © <a href="https://www.esri.com/">Esri</a> | © Lukas Beuster, Senseable City Lab MIT / TU Delft 3D Geoinformation',
         maxZoom: 19,
       }
     );
+    const darkLabels = L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+      {
+        attribution: '',
+        maxZoom: 19,
+        opacity: 0.85,
+      }
+    );
+    const darkTiles = L.layerGroup([darkBase, darkLabels]);
 
     const satelliteTiles = L.tileLayer(
       'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
@@ -704,7 +714,14 @@ const LENS = {
 
     if (old && this.map.hasLayer(old)) this.map.removeLayer(old);
     if (next && !this.map.hasLayer(next)) next.addTo(this.map);
-    if (next) next.bringToBack();
+    // Keep basemap under data overlays (LayerGroup or single TileLayer)
+    if (next) {
+      if (typeof next.bringToBack === 'function') {
+        next.bringToBack();
+      } else if (typeof next.eachLayer === 'function') {
+        next.eachLayer(l => l.bringToBack && l.bringToBack());
+      }
+    }
 
     // Re-render choropleth with adjusted opacity for satellite
     if (this.state.layerChoropleth) {
