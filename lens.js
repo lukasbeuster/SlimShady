@@ -107,12 +107,15 @@ const LENS = {
     this.map.zoomControl.setPosition('bottomright');
 
     // Esri Dark Gray basemap (no API key required)
-    // Note: Esri tile URLs use {z}/{y}/{x} order
+    // Note: Esri tile URLs use {z}/{y}/{x} order.
+    // maxNativeZoom 16: Esri returns "Map data not yet available" placeholders
+    // past z16; Leaflet overzooms (upscales) z16 tiles for z17–19 instead.
     const darkBase = L.tileLayer(
       'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
       {
         attribution: 'Tiles © <a href="https://www.esri.com/">Esri</a> | © Lukas Beuster, Senseable City Lab MIT / TU Delft 3D Geoinformation',
         maxZoom: 19,
+        maxNativeZoom: 16,
       }
     );
     const darkLabels = L.tileLayer(
@@ -120,6 +123,7 @@ const LENS = {
       {
         attribution: '',
         maxZoom: 19,
+        maxNativeZoom: 16,
         opacity: 0.85,
       }
     );
